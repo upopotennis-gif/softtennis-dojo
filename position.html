@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ソフトテニス道場 ポジション練習</title>
+<meta name="description" content="相手の打点を動かすと前衛・後衛の立ち位置が変わる図と、自分で立ち位置を当てる10問の練習。">
+<style>  :root{
+    --head-font:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;
+    --body-font:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif;
+    --code-font:ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --ai:#1d6a4b;
+    --ai-deep:#11422e;
+    --yamabuki:#c9643a;
+    --yamabuki-deep:#9a4322;
+    --wakatake:#2f7d4c;
+    --wakatake-bg:#e1f0e4;
+    --kobai:#bf3b33;
+    --kobai-bg:#f8e4e1;
+    --bg:#f1f5f0;
+    --surface:#ffffff;
+    --surface-2:#e2ece3;
+    --ink:#15231b;
+    --ink-soft:#4f6457;
+    --line:#bdd1c1;
+    --shadow:rgba(17,50,33,0.12);
+    --focus:#c9643a;
+    --court:#3b8a5e;
+    --court-out:#2b6c49;
+    --court-line:#ffffff;
+    --net:#1b2a22;
+    --pale-line:rgba(29,106,75,0.10);
+    --marker:rgba(201,100,58,0.26);
+    --btn-ink:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ai:#7fcfa2;
+      --ai-deep:#c3ecd4;
+      --yamabuki:#e98a5f;
+      --yamabuki-deep:#ffb58f;
+      --wakatake:#84c995;
+      --wakatake-bg:#1b3223;
+      --kobai:#ea8f88;
+      --kobai-bg:#3b2221;
+      --bg:#0e1712;
+      --surface:#14211a;
+      --surface-2:#1d2e24;
+      --ink:#e2eee6;
+      --ink-soft:#98b1a1;
+      --line:#2d463a;
+      --shadow:rgba(0,0,0,0.45);
+      --focus:#e98a5f;
+      --court:#2c6a48;
+      --court-out:#1d4d34;
+      --court-line:#eaf3ee;
+      --net:#0a100c;
+      --pale-line:rgba(127,207,162,0.07);
+      --marker:rgba(233,138,95,0.30);
+      --btn-ink:#1a0b04;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ai:#7fcfa2;
+    --ai-deep:#c3ecd4;
+    --yamabuki:#e98a5f;
+    --yamabuki-deep:#ffb58f;
+    --wakatake:#84c995;
+    --wakatake-bg:#1b3223;
+    --kobai:#ea8f88;
+    --kobai-bg:#3b2221;
+    --bg:#0e1712;
+    --surface:#14211a;
+    --surface-2:#1d2e24;
+    --ink:#e2eee6;
+    --ink-soft:#98b1a1;
+    --line:#2d463a;
+    --shadow:rgba(0,0,0,0.45);
+    --focus:#e98a5f;
+    --court:#2c6a48;
+    --court-out:#1d4d34;
+    --court-line:#eaf3ee;
+    --net:#0a100c;
+    --pale-line:rgba(127,207,162,0.07);
+    --marker:rgba(233,138,95,0.30);
+    --btn-ink:#1a0b04;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body-font);
+    -webkit-font-smoothing:antialiased;
+  }
+  .stage{
+    max-width:680px;
+    margin:0 auto;
+    padding:28px 18px 60px;
+    position:relative;
+  }
+  .stage::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:radial-gradient(circle at 1px 1px, var(--line) 1px, transparent 0);
+    background-size:16px 16px;
+    opacity:.22;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+    z-index:0;
+  }
+  :root:not([data-theme="light"]) .stage::before{ mix-blend-mode:screen; opacity:.10; }
+  :root[data-theme="dark"] .stage::before{ mix-blend-mode:screen; opacity:.10; }
+
+  .stage > *{ position:relative; z-index:1; }
+
+  .rod{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:0 auto;
+  }
+  .rod::before,.rod::after{
+    content:'';
+    flex:1;
+    height:5px;
+    border-radius:3px;
+    background:var(--ai-deep);
+  }
+  .rod .knob{
+    width:14px; height:14px; border-radius:50%;
+    background:var(--yamabuki);
+    box-shadow:0 0 0 2px var(--surface);
+    flex:none;
+  }
+
+  header.masthead{ text-align:center; padding:6px 0 22px; }
+  header.masthead .rod{ margin-bottom:16px; }
+  h1{
+    font-family:var(--head-font);
+    font-weight:800;
+    font-size:clamp(1.6rem, 1.1rem + 3vw, 2.3rem);
+    letter-spacing:.03em;
+    margin:0 0 8px;
+    text-wrap:balance;
+  }
+  header.masthead p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:.92rem;
+    line-height:1.75;
+  }
+
+  section{ display:block; }
+  section[hidden]{ display:none !important; }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:22px 20px;
+    box-shadow:0 3px 14px var(--shadow);
+  }
+  .card + .card{ margin-top:16px; }
+
+  .steps{
+    list-style:none;
+    margin:0 0 20px;
+    padding:0;
+    display:grid;
+    gap:8px;
+    font-size:.9rem;
+    color:var(--ink-soft);
+  }
+  .steps li{ display:flex; gap:10px; align-items:baseline; }
+  .steps .num{
+    font-family:var(--head-font);
+    color:var(--yamabuki-deep);
+    font-weight:700;
+    flex:none;
+    width:1.4em;
+  }
+
+  label.field-label{
+    display:block;
+    font-weight:700;
+    margin-bottom:4px;
+    font-size:.95rem;
+  }
+  .field-hint{
+    font-size:.8rem;
+    color:var(--ink-soft);
+    margin:0 0 10px;
+  }
+
+  .unit-group{ margin-bottom:18px; }
+  .unit-group:last-child{ margin-bottom:0; }
+  .unit-group h3{
+    font-family:var(--head-font);
+    font-size:.95rem;
+    font-weight:700;
+    color:var(--ai);
+    margin:0 0 8px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--line);
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .chip{
+    border:1.5px solid var(--line);
+    background:var(--bg);
+    color:var(--ink);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:.84rem;
+    line-height:1.4;
+    cursor:pointer;
+    font-family:var(--body-font);
+    text-align:left;
+  }
+  .chip:hover{ border-color:var(--ai); }
+  .chip.active{ background:var(--ai); color:var(--surface); border-color:var(--ai); font-weight:700; }
+
+  .selected-unit-box{
+    margin-top:18px;
+    padding:12px 14px;
+    background:var(--surface-2);
+    border-radius:8px;
+    font-size:.88rem;
+  }
+  .selected-unit-box strong{
+    font-family:var(--head-font);
+    color:var(--ai);
+  }
+
+  textarea:focus-visible, button:focus-visible, .choice:focus-visible, .chip:focus-visible, input:focus-visible{
+    outline:3px solid var(--focus);
+    outline-offset:2px;
+  }
+
+  .actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:20px;
+  }
+  button.btn{
+    font-family:var(--body-font);
+    font-weight:700;
+    font-size:1.02rem;
+    padding:15px 18px;
+    border-radius:10px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  @media (prefers-reduced-motion: reduce){ button.btn{ transition:none; } }
+  button.btn:active{ transform:translateY(1px); }
+  button.btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+  .btn-primary{
+    background:var(--yamabuki);
+    color:var(--btn-ink);
+    box-shadow:0 3px 0 var(--yamabuki-deep);
+  }
+  .btn-primary:hover:not(:disabled){ filter:brightness(1.04); }
+  .btn-secondary{
+    background:transparent;
+    color:var(--ai);
+    border-color:var(--ai);
+  }
+  .btn-secondary:hover:not(:disabled){ background:var(--surface-2); }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    border:none;
+    text-decoration:underline;
+    padding:8px;
+    font-size:.9rem;
+  }
+
+  #error-banner[hidden]{ display:none !important; }
+  #error-banner{
+    background:var(--kobai-bg);
+    border:1px solid var(--kobai);
+    color:var(--kobai);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:.88rem;
+    margin-bottom:14px;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:flex-start;
+  }
+  #error-banner button{
+    background:none; border:none; color:inherit; font-weight:700; cursor:pointer; font-size:1rem; line-height:1;
+  }
+
+  .quiz-progress{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:6px;
+    font-family:var(--head-font);
+  }
+  .quiz-progress .count{ font-size:1.1rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .quiz-progress .score{ font-size:.85rem; color:var(--ink-soft); font-family:var(--body-font); }
+  .quiz-unit{
+    font-size:.8rem;
+    color:var(--ink-soft);
+    margin:0 0 14px;
+  }
+  .passage-box{
+    background:var(--surface-2);
+    border-radius:8px;
+    padding:14px 16px;
+    margin:0 0 18px;
+  }
+  .passage-box .label{
+    font-weight:700;
+    color:var(--ai);
+    display:block;
+    margin-bottom:6px;
+    font-size:.78rem;
+    letter-spacing:.04em;
+  }
+  .passage-box p{
+    font-family:var(--head-font);
+    font-size:.98rem;
+    line-height:1.9;
+    margin:0;
+    white-space:pre-wrap;
+  }
+  .dots{ display:flex; gap:5px; margin-bottom:18px; flex-wrap:wrap; }
+  .dots span{ width:9px; height:9px; border-radius:50%; background:var(--line); }
+  .dots span.done-correct{ background:var(--wakatake); }
+  .dots span.done-wrong{ background:var(--kobai); }
+  .dots span.current{ background:var(--yamabuki); }
+
+  .question-text{
+    font-family:var(--head-font);
+    font-size:clamp(1.05rem, .9rem + 1vw, 1.3rem);
+    line-height:1.85;
+    margin:0 0 20px;
+    text-wrap:balance;
+  }
+
+  .choices{ display:grid; gap:10px; }
+  .choice{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+    width:100%;
+    background:var(--bg);
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:14px 16px;
+    font-family:var(--body-font);
+    font-size:1rem;
+    line-height:1.6;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .choice:hover:not(:disabled){ border-color:var(--ai); }
+  .choice .badge{
+    flex:none;
+    width:28px; height:28px;
+    border-radius:50%;
+    background:var(--surface-2);
+    color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:.85rem;
+    font-family:var(--head-font);
+  }
+  .choice:disabled{ cursor:default; }
+  .choice.correct{ background:var(--wakatake-bg); border-color:var(--wakatake); }
+  .choice.correct .badge{ background:var(--wakatake); color:#fff; }
+  .choice.incorrect{ background:var(--kobai-bg); border-color:var(--kobai); }
+  .choice.incorrect .badge{ background:var(--kobai); color:#fff; }
+
+  .feedback{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px dashed var(--line);
+  }
+  .feedback .verdict{
+    font-family:var(--head-font);
+    font-weight:800;
+    font-size:1.15rem;
+    margin:0 0 10px;
+  }
+  .feedback .verdict.correct{ color:var(--wakatake); }
+  .feedback .verdict.incorrect{ color:var(--kobai); }
+  .feedback .explanation{ font-size:.95rem; line-height:1.8; margin:0 0 12px; }
+  .feedback .translation{
+    background:var(--surface-2);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:.9rem;
+    line-height:1.8;
+  }
+  .feedback .translation .label{
+    font-weight:700;
+    color:var(--ai);
+    display:block;
+    margin-bottom:4px;
+    font-size:.78rem;
+    letter-spacing:.04em;
+  }
+
+  .result-head{ text-align:center; padding:8px 0 22px; }
+  .stamp{
+    width:118px; height:118px;
+    margin:0 auto 16px;
+    border-radius:50%;
+    border:3px solid var(--kobai);
+    box-shadow:inset 0 0 0 3px var(--surface), 0 3px 10px var(--shadow);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transform:rotate(-5deg);
+    color:var(--kobai);
+    font-family:var(--head-font);
+  }
+  .stamp .frac{ font-size:1.7rem; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
+  .stamp .of{ font-size:.7rem; margin-top:2px; }
+  .result-message{ font-size:.98rem; line-height:1.8; color:var(--ink-soft); max-width:32em; margin:0 auto; }
+
+  .guide-content{
+    font-size:.98rem;
+    line-height:1.95;
+  }
+  .guide-content h1,.guide-content h2,.guide-content h3{
+    font-family:var(--head-font);
+    margin:1.2em 0 .5em;
+    line-height:1.5;
+  }
+  .guide-content h1{ font-size:1.25rem; }
+  .guide-content h2{ font-size:1.12rem; }
+  .guide-content h3{ font-size:1.02rem; }
+  .guide-content p{ margin:0 0 .9em; }
+  .guide-content ul,.guide-content ol{ margin:0 0 1em; padding-left:1.4em; }
+  .guide-content li{ margin-bottom:.4em; }
+  .guide-content strong{ color:var(--ai); }
+  .guide-content code{ background:var(--surface-2); padding:.1em .3em; border-radius:4px; }
+  .thinking{ color:var(--ink-soft); }
+
+  footer{
+    text-align:center;
+    font-size:.75rem;
+    color:var(--ink-soft);
+    margin-top:34px;
+    line-height:1.7;
+  }
+
+
+/* ==== 記録機能 追加分 ==== */
+.sub-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:22px; }
+.stat-tile{ border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--bg); }
+.stat-tile .k{ display:block; font-size:.74rem; color:var(--ink-soft); letter-spacing:.06em; }
+.stat-tile .v{ display:block; font-size:1.5rem; font-weight:700; color:var(--ai); font-variant-numeric:tabular-nums; margin-top:2px; }
+.stat-tile .v small{ font-size:.8rem; font-weight:400; color:var(--ink-soft); margin-left:2px; }
+.stats-empty{ color:var(--ink-soft); padding:18px 0; }
+.stat-table{ width:100%; border-collapse:collapse; font-size:.9rem; }
+.stat-table th{ text-align:left; font-size:.72rem; letter-spacing:.08em; color:var(--ink-soft); border-bottom:1px solid var(--line); padding:6px 8px; font-weight:700; }
+.stat-table td{ border-bottom:1px solid var(--line); padding:8px; vertical-align:middle; }
+.stat-table td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.rate-bar{ display:block; position:relative; height:8px; border-radius:4px; background:var(--line); min-width:70px; }
+.rate-bar i{ position:absolute; left:0; top:0; bottom:0; border-radius:4px; background:var(--wakatake); }
+.rate-bar i.low{ background:var(--kobai); }
+.rate-bar i.mid{ background:var(--yamabuki); }
+.cal{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; max-width:330px; }
+.cal span{ aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:.74rem;
+  border-radius:6px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+.cal span.head{ color:var(--ink-soft); font-size:.68rem; aspect-ratio:auto; padding-bottom:2px; }
+.cal span.on{ background:var(--wakatake); color:#fff; font-weight:700; }
+.cal span.today{ outline:2px solid var(--yamabuki); outline-offset:-2px; }
+.stats-section-title{ font-size:.95rem; font-weight:700; margin:26px 0 10px; color:var(--ai); }
+.wrongbox-line{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:6px; }
+.privacy-note{ font-size:.76rem; color:var(--ink-soft); margin-top:26px; line-height:1.7; }
+
+/* ==== 狭い画面（スマホ）の調整 ==== */
+@media (max-width:400px){
+  h1{ font-size:1.5rem; letter-spacing:.01em; }
+  .stage{ padding:20px 14px 48px; }
+  .card{ padding:18px 15px; }
+  .chip{ font-size:.82rem; padding:8px 12px; }
+  .stat-grid{ grid-template-columns:repeat(2,1fr); }
+}
+#btn-next-question{ scroll-margin-bottom:24px; }
+
+/* ==== 道場の切り替え ==== */
+nav.sister{ display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin:0 0 18px; }
+nav.sister a{ font-size:.82rem; padding:6px 14px; border-radius:999px; border:1px solid var(--line);
+  color:var(--ink-soft); text-decoration:none; background:var(--surface); }
+nav.sister a:hover{ border-color:var(--ai); color:var(--ai); }
+nav.sister a[aria-current]{ background:var(--ai); border-color:var(--ai); color:var(--surface); font-weight:700; }
+
+/* ==== ソフトテニス道場の装い: コートのラインとネット ==== */
+.stage::before,
+:root:not([data-theme="light"]) .stage::before,
+:root[data-theme="dark"] .stage::before{
+  background-image:
+    linear-gradient(90deg, transparent calc(50% - 1px), var(--pale-line) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(90deg, var(--pale-line) 3px, transparent 3px),
+    linear-gradient(270deg, var(--pale-line) 3px, transparent 3px);
+  background-size:100% 100%, 100% 100%, 100% 100%;
+  background-position:0 0;
+  opacity:1; mix-blend-mode:normal;
+  inset:0 max(12px, calc(50% - 380px));
+}
+.rod{ gap:0; }
+.rod::before,.rod::after{
+  height:14px; border-radius:0;
+  background:
+    linear-gradient(var(--court-line), var(--court-line)) top / 100% 3px no-repeat,
+    repeating-linear-gradient(90deg, var(--ink-soft) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(0deg, var(--ink-soft) 0 1px, transparent 1px 5px);
+  border-top:1px solid var(--line);
+  opacity:.8;
+}
+.rod .knob{
+  width:5px; height:22px; border-radius:1px;
+  background:var(--ai-deep); box-shadow:none;
+}
+.rod .knob + .knob{ display:none; }
+header.masthead h1{ font-weight:900; letter-spacing:.04em; }
+header.masthead h1 .hl{ background:linear-gradient(transparent 62%, var(--marker) 62%); padding:0 .1em; }
+.card{ border-radius:6px; border-top:4px double var(--ai); }
+.chip{ border-radius:6px; }
+.choice{ border-radius:6px; }
+.choice .badge{ border-radius:50%; }
+button.btn{ border-radius:6px; }
+.dots span{ border-radius:50%; }
+.stamp{
+  border-radius:50%; transform:rotate(-6deg); border:3px solid var(--ai); color:var(--ai);
+  background:
+    radial-gradient(circle at 50% -38%, transparent 58%, var(--line) 58% calc(58% + 2px), transparent calc(58% + 2px)),
+    radial-gradient(circle at 50% 138%, transparent 58%, var(--line) 58% calc(58% + 2px), transparent calc(58% + 2px)),
+    var(--surface);
+}
+.unit-group h3::before{ content:''; display:inline-block; width:.7em; height:.7em; margin-right:.4em;
+  border-radius:50%; background:var(--yamabuki); vertical-align:.02em; }
+.steps .num{ color:var(--yamabuki-deep); }
+.cal span.on{ color:#fff; }
+.h1-name, header.masthead h1 .hl{ display:inline-block; }
+/* ==== コート図（court.js） ==== */
+.court-svg{ display:block; width:100%; height:auto; max-width:100%; touch-action:none; user-select:none; -webkit-user-select:none; }
+.court-svg text{ font-family:var(--head-font); text-anchor:middle; dominant-baseline:central; }
+.c-out{ fill:var(--court-out); }
+.c-in{ fill:var(--court); }
+.c-line{ stroke:var(--court-line); stroke-width:.05; fill:none; }
+.c-net line{ stroke:var(--net); stroke-width:.16; }
+.c-net circle{ fill:var(--net); }
+.c-label text{ fill:var(--court-line); font-size:.62px; font-weight:700; opacity:.78; letter-spacing:.08px; }
+.c-note{ fill:var(--court-line); font-size:.52px; font-weight:700; paint-order:stroke; stroke:var(--court-out); stroke-width:.14px; }
+
+.pl{ transition:transform .55s cubic-bezier(.3,.7,.3,1); }
+.pl-body{ stroke:var(--court-line); stroke-width:.09; }
+.pl-own .pl-body{ fill:var(--yamabuki); }
+.pl-opp .pl-body{ fill:#243a55; }
+.pl-text{ fill:#fff; font-size:.66px; font-weight:900; }
+.pl-name{ fill:var(--court-line); font-size:.5px; font-weight:700; paint-order:stroke; stroke:var(--court-out); stroke-width:.14px; }
+.pl-reach{ fill:rgba(255,255,255,.16); stroke:rgba(255,255,255,.7); stroke-width:.04; stroke-dasharray:.2 .15; }
+.pl.is-focus .pl-body{ stroke:#ffe27a; stroke-width:.16; }
+.pl.is-ghost{ opacity:.45; }
+.pl.draggable{ cursor:grab; }
+.pl.draggable:active{ cursor:grabbing; }
+
+.shot-line{ fill:none; stroke-width:.13; stroke-linecap:round; }
+.shot-own{ stroke:#ffd9c2; }
+.shot-opp{ stroke:#c9dcff; }
+.shot-ball{ fill:#fff; stroke:#333; stroke-width:.03; }
+.shot-land{ fill:none; stroke:#fff; stroke-width:.06; }
+.arrow-own{ fill:#ffd9c2; }
+.arrow-opp{ fill:#c9dcff; }
+.arrow-ball, .arrow-hint{ fill:#fff; }
+.shot.is-old{ opacity:.28; }
+
+.g-range{ fill:rgba(255,255,255,.10); stroke:none; }
+.g-straight{ fill:rgba(255,226,122,.22); stroke:none; }
+.g-center{ stroke:#ffe27a; stroke-width:.06; stroke-dasharray:.3 .2; }
+.g-bisect{ stroke:#c9dcff; stroke-width:.06; stroke-dasharray:.3 .2; }
+.g-edge{ stroke:rgba(255,255,255,.55); stroke-width:.04; }
+.g-ideal{ fill:none; stroke:#ffe27a; stroke-width:.1; stroke-dasharray:.25 .15; }
+.g-ideal-back{ fill:none; stroke:#c9dcff; stroke-width:.1; stroke-dasharray:.25 .15; }
+.g-err{ stroke:#fff; stroke-width:.06; }
+.g-band{ fill:rgba(255,226,122,.14); stroke:rgba(255,226,122,.55); stroke-width:.04; }
+
+/* 図まわり */
+.figure{ margin:18px 0; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:12px; }
+.figure-grid{ display:grid; grid-template-columns:minmax(0, 250px) minmax(0, 1fr); gap:16px; align-items:start; }
+.figure-grid .court-wrap{ max-width:250px; width:100%; margin:0 auto; }
+@media (max-width:560px){
+  .figure-grid{ grid-template-columns:1fr; }
+  .figure-grid .court-wrap{ max-width:230px; }
+}
+.legend{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:.78rem; color:var(--ink-soft); margin:8px 0 0; padding:0; list-style:none; }
+.legend li{ display:flex; align-items:center; gap:6px; }
+.legend i{ display:inline-block; width:14px; height:14px; border-radius:50%; border:2px solid var(--line); }
+.legend i.own{ background:var(--yamabuki); }
+.legend i.opp{ background:#243a55; }
+.legend i.bar{ width:20px; height:0; border-radius:0; border:0; border-top:3px dashed var(--yamabuki); }
+.legend i.bar.solid{ border-top-style:solid; border-top-color:var(--ink-soft); }
+/* ==== セオリー講座・ポジション練習の部品 ==== */
+.stage{ max-width:760px; }
+main > * + *{ margin-top:16px; }
+.card h2{ font-family:var(--head-font); font-size:1.2rem; margin:0 0 12px; text-wrap:balance; }
+
+/* 目次 */
+.toc{ display:flex; flex-wrap:wrap; gap:6px; margin:0; padding:0; list-style:none; counter-reset:toc; }
+.toc a{ display:inline-flex; align-items:baseline; gap:6px; font-size:.84rem; padding:6px 12px; border-radius:6px;
+  border:1px solid var(--line); color:var(--ink); text-decoration:none; background:var(--surface); }
+.toc a:hover{ border-color:var(--ai); color:var(--ai); }
+.toc a[aria-current]{ border-color:var(--ai); box-shadow:inset 0 -3px 0 var(--ai); }
+.toc a .no{ font-family:var(--head-font); font-weight:900; color:var(--yamabuki-deep); font-variant-numeric:tabular-nums; }
+.toc-card{ padding:12px 14px; }
+.toc-title{ font-size:.75rem; letter-spacing:.12em; color:var(--ink-soft); margin:0 0 6px; }
+
+/* 章の本文 */
+.chapter{ scroll-margin-top:16px; }
+.chapter .eyebrow{ font-family:var(--head-font); font-size:.78rem; letter-spacing:.14em; color:var(--yamabuki-deep); font-weight:700; margin:0 0 4px; }
+.chapter h2{ font-size:clamp(1.25rem, 1rem + 1.2vw, 1.55rem); margin:0 0 6px; }
+.chapter .lead{ color:var(--ink-soft); margin:0 0 14px; }
+.prose{ line-height:1.9; font-size:.98rem; }
+.prose p, .prose ul, .prose ol{ margin:0 0 12px; max-width:40em; }
+.prose h3{ font-family:var(--head-font); font-size:1.05rem; margin:24px 0 8px; padding-left:10px;
+  border-left:4px solid var(--ai); line-height:1.4; }
+.prose ul, .prose ol{ padding-left:1.3em; }
+.prose li + li{ margin-top:4px; }
+.prose strong{ background:linear-gradient(transparent 64%, var(--marker) 64%); }
+.prose table{ border-collapse:collapse; font-size:.88rem; min-width:100%; }
+.prose th, .prose td{ border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; line-height:1.6; }
+.prose th{ background:var(--surface-2); font-family:var(--head-font); white-space:nowrap; }
+.table-wrap{ overflow-x:auto; margin:0 0 14px; }
+.callout{ border:1px solid var(--line); border-left:5px solid var(--yamabuki); background:var(--surface-2);
+  border-radius:6px; padding:10px 14px; margin:14px 0; max-width:42em; }
+.callout p:last-child{ margin-bottom:0; }
+.callout .callout-title{ font-family:var(--head-font); font-weight:700; color:var(--yamabuki-deep); margin:0 0 4px; font-size:.9rem; }
+.callout.is-miss{ border-left-color:var(--kobai); }
+.callout.is-miss .callout-title{ color:var(--kobai); }
+.try-link{ display:inline-flex; gap:6px; align-items:center; font-weight:700; color:var(--ai); }
+
+/* 展開図のコマ送り */
+.rally .rally-title{ font-family:var(--head-font); font-weight:700; margin:0 0 8px; font-size:1rem; }
+.rally-text{ min-height:6.2em; line-height:1.8; margin:0 0 10px; font-size:.94rem; }
+.rally-text .kind{ display:inline-block; font-size:.72rem; font-weight:700; padding:1px 8px; margin-right:6px;
+  border-radius:999px; background:var(--ai); color:var(--surface); vertical-align:.1em; }
+.rally-ctrl{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.rally-count{ font-variant-numeric:tabular-nums; color:var(--ink-soft); font-size:.85rem; margin-right:auto; }
+.rally-ctrl .btn{ padding:8px 16px; font-size:.88rem; }
+
+/* ポジション練習 */
+.tabs{ display:flex; gap:0; margin:0 0 16px; border-bottom:2px solid var(--line); }
+.tabs button{ font:inherit; font-family:var(--head-font); font-weight:700; font-size:.95rem; padding:10px 16px;
+  border:0; background:none; color:var(--ink-soft); cursor:pointer; border-bottom:4px solid transparent; margin-bottom:-2px; }
+.tabs button[aria-selected="true"]{ color:var(--ai); border-bottom-color:var(--ai); }
+.tabs button:focus-visible{ outline:3px solid var(--focus); outline-offset:-3px; }
+.panel-title{ font-size:.82rem !important; letter-spacing:.1em; color:var(--ink-soft); margin:0 0 8px !important; }
+.panel .chips{ margin-bottom:14px; }
+.readout{ background:var(--surface-2); border-radius:6px; padding:10px 12px; margin:0 0 16px; font-size:.9rem; line-height:1.75; }
+.readout p{ margin:0 0 6px; }
+.readout dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:4px 10px; }
+.readout dt{ font-family:var(--head-font); font-weight:700; color:var(--yamabuki-deep); }
+.readout dd{ margin:0; }
+.toggles{ display:grid; gap:6px; font-size:.88rem; }
+.toggles label{ display:flex; gap:8px; align-items:center; cursor:pointer; }
+.toggles input{ accent-color:var(--ai); width:18px; height:18px; }
+.drag-hint{ font-size:.8rem; color:var(--ink-soft); margin:8px 0 0; line-height:1.6; }
+.rules ol{ margin:0; padding-left:1.3em; line-height:1.85; }
+.rules li + li{ margin-top:8px; }
+.quiz-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.quiz-head .dots{ margin:0; }
+#quiz-count{ font-family:var(--head-font); font-weight:700; font-variant-numeric:tabular-nums; }
+.quiz-role{ font-family:var(--head-font); font-size:1.15rem; margin:0 0 6px; }
+.quiz-role b{ color:var(--yamabuki-deep); }
+.quiz-scene{ margin:0 0 6px; line-height:1.75; }
+.quiz-scene .sub{ font-size:.8rem; color:var(--ink-soft); }
+.quiz-actions{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 0; }
+.verdict{ margin-top:14px; border-radius:6px; padding:10px 14px; font-size:.9rem; line-height:1.75; }
+.verdict.is-good{ background:var(--wakatake-bg); }
+.verdict.is-bad{ background:var(--kobai-bg); }
+.verdict .v-head{ font-family:var(--head-font); font-weight:900; font-size:1.1rem; margin:0 0 4px; }
+.verdict.is-good .v-head{ color:var(--wakatake); }
+.verdict.is-bad .v-head{ color:var(--kobai); }
+.verdict .v-head span{ font-size:.8rem; font-weight:500; color:var(--ink-soft); margin-left:6px; }
+.verdict ul{ margin:4px 0 6px; padding-left:1.2em; }
+.verdict .v-why{ margin:6px 0 0; color:var(--ink-soft); font-size:.85rem; }
+.result-row{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+.result-row h2{ margin:0 0 4px; }
+.result-row p{ margin:0 0 4px; }
+.best{ font-size:.85rem; color:var(--ink-soft); }
+.stamp{ flex:none; }
+
+/* 試合分析 */
+.scene{ border-top:1px solid var(--line); padding-top:16px; margin-top:18px; }
+.scene-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 10px; margin-bottom:8px; }
+.scene-head h3{ font-family:var(--head-font); font-size:1.05rem; margin:0; }
+.scene-time{ font-family:var(--head-font); font-weight:900; font-variant-numeric:tabular-nums; color:var(--surface);
+  background:var(--ai); border-radius:4px; padding:1px 8px; font-size:.85rem; }
+.badge-draft, .badge-sample{ font-size:.72rem; font-weight:700; border-radius:999px; padding:2px 10px; margin-left:8px;
+  border:1px dashed var(--yamabuki-deep); color:var(--yamabuki-deep); vertical-align:.2em; white-space:nowrap; }
+.badge-sample{ border-style:solid; }
+.video-slot{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin:6px 0 10px; font-size:.88rem; }
+.video-slot a{ color:var(--ai); }
+.video-frame{ width:100%; aspect-ratio:16/9; border:0; border-radius:6px; background:#000; flex-basis:100%; }
+.related{ font-size:.86rem; color:var(--ink-soft); margin:8px 0; }
+.related a{ color:var(--ai); font-weight:700; }
+.waiting{ color:var(--ink-soft); background:var(--surface-2); border-radius:6px; padding:10px 14px; }
+.think{ background:var(--surface-2); border:1px solid var(--line); border-radius:6px; padding:10px 14px; margin:12px 0 4px; line-height:1.8; }
+.think summary{ cursor:pointer; list-style:none; }
+.think summary::-webkit-details-marker{ display:none; }
+.think-choices{ margin:6px 0; padding-left:1.4em; }
+.think-open{ display:inline-block; font-size:.84rem; font-weight:700; color:var(--ai); border-bottom:1px dashed var(--ai); }
+.think[open] .think-open{ display:none; }
+.think p{ margin:8px 0 0; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+</head>
+<body>
+<div class="stage">
+  <header class="masthead">
+    <div class="rod"><span class="knob"></span><span class="knob"></span></div>
+    <h1><span class="h1-name">ソフトテニス道場</span> <span class="hl">ポジション練習</span></h1>
+    <p>相手が打つ位置が変われば、前衛と後衛の立つ位置も変わります。<br>まず「しくみを見る」で線の引き方を確かめ、「立ってみる」で自分の立ち位置を当ててみましょう。</p>
+    <div class="rod" style="margin-top:16px"><span class="knob"></span><span class="knob"></span></div>
+  </header>
+
+  <nav class="sister" aria-label="道場の切り替え"><a href="./">セオリー講座</a><a href="position.html" aria-current="page">ポジション練習</a><a href="drill.html">セオリードリル</a><a href="match.html">試合分析</a></nav>
+
+  <div class="tabs" role="tablist" aria-label="練習の種類">
+    <button type="button" role="tab" id="tab-look" aria-selected="true" aria-controls="panel-look">しくみを見る</button>
+    <button type="button" role="tab" id="tab-quiz" aria-selected="false" aria-controls="panel-quiz">立ってみる（10問）</button>
+  </div>
+
+  <main>
+    <!-- しくみを見る -->
+    <section id="panel-look" role="tabpanel" aria-labelledby="tab-look">
+      <div class="card">
+        <div class="figure-grid">
+          <div class="court-wrap">
+            <svg id="look-court" role="img" aria-label="コート図。上が相手コート、下が味方コート。青い駒が打つ相手、オレンジの駒が味方"></svg>
+            <p class="drag-hint">青い<b>「後」</b>（相手後衛）をドラッグして、打つ位置を変えられます。</p>
+          </div>
+          <div class="panel">
+            <h2 class="panel-title">相手の打つ位置</h2>
+            <div class="chips" id="look-presets"></div>
+
+            <div class="readout" id="look-readout" aria-live="polite"></div>
+
+            <h2 class="panel-title">どちらが打つ場面か</h2>
+            <div class="chips" id="look-phase">
+              <button type="button" class="chip active" data-phase="opp" aria-pressed="true">相手後衛が打つ（詰める）</button>
+              <button type="button" class="chip" data-phase="own" aria-pressed="false">味方後衛が打つ（一歩下がる）</button>
+            </div>
+
+            <h2 class="panel-title">表示する線</h2>
+            <div class="toggles">
+              <label><input type="checkbox" id="show-range" checked> 相手が打てる範囲</label>
+              <label><input type="checkbox" id="show-front" checked> 前衛の線（打点とセンターマーク）</label>
+              <label><input type="checkbox" id="show-back" checked> 後衛の線（前衛が守れない範囲のまん中）</label>
+              <label><input type="checkbox" id="show-reach" checked> 前衛の守備範囲（目安）</label>
+            </div>
+            <ul class="legend">
+              <li><i class="bar" style="border-top-color:#c9a227"></i>前衛の線</li>
+              <li><i class="bar" style="border-top-color:#8fb0e8"></i>後衛の線</li>
+              <li><i class="own"></i>味方</li>
+              <li><i class="opp"></i>相手</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rules">
+        <h2>立ち位置を決める3つのきまり</h2>
+        <ol><li><strong>前衛は「相手の打点」と「味方のセンターマーク」を結んだ線の上に立つ。</strong> 打点が動いたら、線ごと動く。ストレートが気になっても、外へ寄りすぎない（センターを空けるほうが損）。</li><li><strong>前衛のネットからの距離は「だれが打つか」で決める。</strong> 相手後衛が打つときは<strong>ネットに詰める</strong>（この図では約1.5m）。味方後衛が打つときは<strong>一歩下がる</strong>（約0.8m）。この「詰める・下がる」をラリー中くり返す。</li><li><strong>後衛は、相手が打てる範囲のうち、前衛が守れない部分のまん中に立つ。</strong> 正クロスならコートの右寄り、逆クロスなら左寄り。打ったら、次の打点を見てこの位置へ戻る。</li></ol>
+      </div>
+    </section>
+
+    <!-- 立ってみる -->
+    <section id="panel-quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+      <div class="card">
+        <div class="quiz-head">
+          <span id="quiz-count">第1問 / 10</span>
+          <span class="dots" id="quiz-dots" aria-hidden="true"></span>
+        </div>
+        <div class="figure-grid">
+          <div class="court-wrap">
+            <svg id="quiz-court" role="img" aria-label="練習用のコート図"></svg>
+          </div>
+          <div class="panel">
+            <p class="quiz-role" id="quiz-role"></p>
+            <p class="quiz-scene" id="quiz-scene"></p>
+            <p class="drag-hint" id="quiz-howto">オレンジの<b>「？」</b>の駒を、自分が立つと思う場所までドラッグします（コートをタップしても動きます。矢印キーでも動かせます）。</p>
+            <div class="quiz-actions">
+              <button type="button" class="btn btn-primary" id="quiz-answer">ここに立つ</button>
+              <button type="button" class="btn btn-primary" id="quiz-next" hidden>次の問題へ</button>
+            </div>
+            <div class="verdict" id="quiz-verdict" aria-live="polite" hidden></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="quiz-result" hidden>
+        <div class="result-row">
+          <div class="stamp"><span class="frac" id="quiz-score">0</span><span class="of">点 / 100</span></div>
+          <div>
+            <h2 id="quiz-result-title">おつかれさま</h2>
+            <p id="quiz-result-text"></p>
+            <p class="best" id="quiz-best"></p>
+          </div>
+        </div>
+        <div class="quiz-actions">
+          <button type="button" class="btn btn-primary" id="quiz-restart">もう一度（問題が変わります）</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>ソフトテニス道場（高校ソフトテニス部の理論学習用）<br>内容は一般に言われるセオリーを部活動向けにまとめたものです。立ち位置の数値は目安で、相手や自分のプレースタイル・指導者の方針によって変わります。<br>試作版です。気づいたことは顧問の先生に知らせてください。</footer>
+</div>
+
+<script>/* ソフトテニス道場 共通のコート図（セオリー講座・ポジション練習で使う）
+ * 単位はメートル。上が相手コート、下が味方コート。
+ *   x: 0（左サイドライン）〜 10.97（右サイドライン）
+ *   y: 0（相手のベースライン）〜 11.885（ネット）〜 23.77（味方のベースライン）
+ */
+var Court = (function(){
+  "use strict";
+  var W = 10.97, L = 23.77, NET = L / 2, ALLEY = 1.37, SVC = 6.40;
+  var PAD_X = 2.6, PAD_Y = 3.6;
+  var NS = "http://www.w3.org/2000/svg";
+  var uid = 0;
+
+  function el(name, attrs, parent){
+    var e = document.createElementNS(NS, name);
+    for(var k in attrs){ if(attrs[k] !== undefined && attrs[k] !== null) e.setAttribute(k, attrs[k]); }
+    if(parent) parent.appendChild(e);
+    return e;
+  }
+  function r(v){ return Math.round(v * 1000) / 1000; }
+
+  // コートを描き、描画用のレイヤーを返す
+  function create(svg, opts){
+    opts = opts || {};
+    var id = "c" + (++uid);
+    svg.setAttribute("viewBox", [-PAD_X, -PAD_Y, W + PAD_X * 2, L + PAD_Y * 2].join(" "));
+    svg.setAttribute("class", (svg.getAttribute("class") || "") + " court-svg");
+    var defs = el("defs", {}, svg);
+    ["own", "opp", "ball", "hint"].forEach(function(k){
+      var m = el("marker", { id: id + "-arrow-" + k, viewBox: "0 0 10 10", refX: 8, refY: 5,
+        markerWidth: 4.2, markerHeight: 4.2, orient: "auto-start-reverse" }, defs);
+      el("path", { d: "M0,0 L10,5 L0,10 z", "class": "arrow-" + k }, m);
+    });
+    el("rect", { x: -PAD_X, y: -PAD_Y, width: W + PAD_X * 2, height: L + PAD_Y * 2, "class": "c-out" }, svg);
+    el("rect", { x: 0, y: 0, width: W, height: L, "class": "c-in" }, svg);
+    var zone = el("g", { "class": "c-zone" }, svg);
+    var lines = el("g", { "class": "c-line" }, svg);
+    el("rect", { x: 0, y: 0, width: W, height: L }, lines);
+    el("line", { x1: ALLEY, y1: 0, x2: ALLEY, y2: L }, lines);
+    el("line", { x1: W - ALLEY, y1: 0, x2: W - ALLEY, y2: L }, lines);
+    el("line", { x1: ALLEY, y1: NET - SVC, x2: W - ALLEY, y2: NET - SVC }, lines);
+    el("line", { x1: ALLEY, y1: NET + SVC, x2: W - ALLEY, y2: NET + SVC }, lines);
+    el("line", { x1: W / 2, y1: NET - SVC, x2: W / 2, y2: NET + SVC }, lines);
+    el("line", { x1: W / 2, y1: 0, x2: W / 2, y2: 0.2 }, lines);
+    el("line", { x1: W / 2, y1: L, x2: W / 2, y2: L - 0.2 }, lines);
+    var net = el("g", { "class": "c-net" }, svg);
+    el("line", { x1: -0.914, y1: NET, x2: W + 0.914, y2: NET }, net);
+    el("circle", { cx: -0.914, cy: NET, r: 0.14 }, net);
+    el("circle", { cx: W + 0.914, cy: NET, r: 0.14 }, net);
+    if(opts.labels !== false){
+      var lab = el("g", { "class": "c-label" }, svg);
+      el("text", { x: W / 2, y: -PAD_Y + 0.55 }, lab).textContent = opts.topLabel || "相手コート";
+      el("text", { x: W / 2, y: L + PAD_Y - 0.5 }, lab).textContent = opts.bottomLabel || "味方コート";
+    }
+    var layers = {};
+    ["guide", "shot", "hint", "player", "ui"].forEach(function(k){
+      layers[k] = el("g", { "class": "layer-" + k }, svg);
+    });
+    return {
+      svg: svg, id: id, zone: zone, layers: layers,
+      clear: function(k){ while(layers[k].firstChild) layers[k].removeChild(layers[k].firstChild); },
+      // マウス・タッチの位置をコートの座標（m）に直す
+      point: function(evt){
+        var p = svg.createSVGPoint();
+        var t = evt.touches && evt.touches[0] ? evt.touches[0] : (evt.changedTouches && evt.changedTouches[0]) || evt;
+        p.x = t.clientX; p.y = t.clientY;
+        var q = p.matrixTransform(svg.getScreenCTM().inverse());
+        return { x: q.x, y: q.y };
+      }
+    };
+  }
+
+  // 選手のコマ。side: "own"（味方）/"opp"（相手）、role: "前" / "後"
+  function player(c, o){
+    var g = el("g", { "class": "pl pl-" + o.side + (o.cls ? " " + o.cls : ""),
+      "data-key": o.key || "" }, c.layers.player);
+    if(o.reach){ el("circle", { r: o.reach, "class": "pl-reach" }, g); }
+    el("circle", { r: 0.62, "class": "pl-body" }, g);
+    var t = el("text", { y: 0.02, "class": "pl-text" }, g);
+    t.textContent = o.role || "";
+    if(o.name){
+      var n = el("text", { y: o.side === "opp" ? -0.95 : 1.35, "class": "pl-name" }, g);
+      n.textContent = o.name;
+    }
+    move(g, o.x, o.y, true);
+    return g;
+  }
+  function move(g, x, y, instant){
+    if(instant){ g.style.transition = "none"; }
+    g.style.transform = "translate(" + r(x) + "px," + r(y) + "px)";
+    g._x = x; g._y = y;
+    if(instant){ g.getBoundingClientRect(); g.style.transition = ""; }
+  }
+
+  // 打球の線。kind: drive（シュート）/ lob（ロブ）/ volley / serve / cut / smash
+  function shot(c, from, to, kind, side){
+    var g = el("g", { "class": "shot shot-" + kind }, c.layers.shot);
+    var mk = "url(#" + c.id + "-arrow-" + (side || "ball") + ")";
+    var d;
+    if(kind === "lob"){
+      var mx = (from.x + to.x) / 2, my = (from.y + to.y) / 2;
+      var dx = to.x - from.x, dy = to.y - from.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var bend = Math.min(2.2, len * 0.14) * (dx >= 0 ? 1 : -1);
+      d = "M" + r(from.x) + "," + r(from.y) + " Q" + r(mx - dy / len * bend) + "," + r(my + dx / len * bend) + " " + r(to.x) + "," + r(to.y);
+    } else {
+      d = "M" + r(from.x) + "," + r(from.y) + " L" + r(to.x) + "," + r(to.y);
+    }
+    var p = el("path", { d: d, "class": "shot-line shot-" + (side || "ball"), "marker-end": mk }, g);
+    el("circle", { cx: r(to.x), cy: r(to.y), r: 0.2, "class": "shot-land" }, g);
+    el("circle", { cx: r(from.x), cy: r(from.y), r: 0.17, "class": "shot-ball" }, g);
+    try{
+      var total = p.getTotalLength();
+      p.style.strokeDasharray = kind === "lob" ? "0.55 0.35" : (kind === "serve" ? "0.2 0.3" : "none");
+      if(!matchMedia("(prefers-reduced-motion: reduce)").matches && kind !== "lob" && kind !== "serve"){
+        p.style.strokeDasharray = total + " " + total;
+        p.style.strokeDashoffset = total;
+        p.getBoundingClientRect();
+        p.style.transition = "stroke-dashoffset .45s ease-out";
+        p.style.strokeDashoffset = 0;
+      }
+    }catch(e){}
+    return g;
+  }
+
+  function line(c, layer, a, b, cls){
+    return el("line", { x1: r(a.x), y1: r(a.y), x2: r(b.x), y2: r(b.y), "class": cls }, c.layers[layer]);
+  }
+  function poly(c, layer, pts, cls){
+    return el("polygon", { points: pts.map(function(p){ return r(p.x) + "," + r(p.y); }).join(" "), "class": cls }, c.layers[layer]);
+  }
+  function dot(c, layer, p, rad, cls){
+    return el("circle", { cx: r(p.x), cy: r(p.y), r: rad, "class": cls }, c.layers[layer]);
+  }
+  function label(c, layer, p, text, cls){
+    var t = el("text", { x: r(p.x), y: r(p.y), "class": cls || "c-note" }, c.layers[layer]);
+    t.textContent = text;
+    return t;
+  }
+
+  return { W: W, L: L, NET: NET, ALLEY: ALLEY, SVC: SVC, PAD_X: PAD_X, PAD_Y: PAD_Y,
+    create: create, player: player, move: move, shot: shot, line: line, poly: poly, dot: dot, label: label, el: el };
+})();
+
+/* ポジション練習（position.html）
+ * 立ち位置の計算は THEORY にまとめてある。指導方針に合わせて数値を変えるときはここだけ直す。
+ */
+(function(){
+  "use strict";
+  var W = Court.W, L = Court.L, NET = Court.NET;
+  var CENTER_MARK = { x: W / 2, y: L };
+
+  var THEORY = {"front":{"close":1.5,"step":0.8,"straightShift":0.2,"reach":1.8},"back":{"behind":0.8,"coverWeight":0.5},"straightLane":2.2,"tolerance":{"front":[0.6,1.2,2.0],"back":[1.0,1.8,2.8]},"presets":[{"label":"正クロスの深い位置","x":1.6,"y":-1.0},{"label":"逆クロスの深い位置","x":9.4,"y":-1.0},{"label":"センター","x":5.5,"y":-0.8},{"label":"追い込まれた（かなり深い）","x":1.0,"y":-2.6},{"label":"前に入って打つ（浅い）","x":2.4,"y":2.8}],"scenes":[{"text":"相手後衛が、クロスの深いボールをベースラインの後ろで打とうとしている。","x":[0.8,2.2],"y":[-1.6,-0.6],"phase":"opp"},{"text":"味方の深いロブで相手後衛が走らされ、ベースラインのかなり後ろで打とうとしている。","x":[0.3,1.6],"y":[-3.0,-2.0],"note":"相手後衛が打つ場面です。苦しい体勢の相手からは甘い返球が来やすいので、前衛はネットに詰めてボレー・スマッシュをねらいます。","phase":"opp"},{"text":"相手後衛が、ベースライン付近のセンターから打とうとしている。","x":[4.6,6.3],"y":[-1.0,0.0],"note":"センターからの打球はストレートとクロスの区別がなくなります。前衛はセンターマークへの線の上に立ちます。","phase":"opp"},{"text":"味方の返球が浅くなり、相手後衛がサービスライン近くまで前に入って打とうとしている。","x":[1.6,3.4],"y":[2.0,3.6],"note":"相手が前に入って強く打ってくる場面でも、打つのは相手です。前衛はネットに詰めて、ボレーでコースを消します。","phase":"opp"},{"text":"相手後衛が、サイドラインの外まで振られてから打とうとしている。","x":[-1.0,0.2],"y":[-1.2,-0.3],"note":"打点がサイドの外に出ると、ストレートのコースが開きやすくなります。前衛はストレートを消す意識を強めます。","phase":"opp"},{"text":"相手後衛が、クロス寄りのベースライン上から打とうとしている。","x":[2.2,3.4],"y":[-0.5,0.3],"phase":"opp"},{"text":"味方後衛が、クロスへ深いボールを打とうとしている。相手後衛はベースライン付近で待っている。","x":[0.8,2.4],"y":[-1.2,-0.3],"phase":"own","note":"味方が打つ場面では、前衛は一歩下がります。相手のボレーやスマッシュ、足元へのボールに備えるためです。"},{"text":"味方後衛が、センターへ返そうとしている。相手後衛はベースラインの後ろで待っている。","x":[4.6,6.3],"y":[-1.6,-0.6],"phase":"own","note":"味方が打ったあと、相手が打つ番になったら、また詰め直します。前衛は「詰める・一歩下がる」をくり返します。"},{"text":"味方後衛が、逆クロスへ打とうとしている。相手後衛はベースライン付近で待っている。","x":[8.6,10.2],"y":[-1.2,-0.3],"phase":"own"}],"why":{"front":"前衛は「相手の打点」と「味方コートのセンターマーク」を結んだ線の上に立つと、ストレートにもセンターにも手が届きます。ストレートを怖がって外へ寄りすぎると、センターが大きく空きます。","back":"後衛は、相手が打てる範囲のうち、前衛が届かない部分のまん中に立ちます。クロスとセンターに来たボールを、どちらも同じくらいの距離で追えます。","frontOpp":"相手後衛が打つ場面では、前衛はネットに詰めます。詰めるほど相手の打てるコースが狭くなり、ボレーで前に入れます。","frontOwn":"味方後衛が打つ場面では、一歩下がります。打ち返されたボールやロブに備えるためです。"}};
+
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
+  function fmt(v){ return (Math.round(v * 10) / 10).toFixed(1); }
+  // 相手の打点 h から見て、ストレート側（h と同じ側のサイドライン）が画面の左なら -1、右なら +1
+  function straightSign(h){ return h.x < W / 2 ? -1 : 1; }
+
+  // 前衛: 打点と味方のセンターマークを結んだ線上。
+  // ネットからの距離は「だれが打つ場面か」で決める（phase: "opp" 相手後衛が打つ＝詰める／"own" 味方後衛が打つ＝一歩下がる）
+  function frontDepth(phase){
+    return phase === "own" ? THEORY.front.close + THEORY.front.step : THEORY.front.close;
+  }
+  function frontIdeal(h, phase){
+    var dn = frontDepth(phase);
+    var y = NET + dn;
+    var t = (y - h.y) / (CENTER_MARK.y - h.y);
+    var x = h.x + (CENTER_MARK.x - h.x) * t;
+    // センターに近い打点ほどストレート寄せは小さくする
+    var off = Math.abs(h.x - W / 2) / (W / 2);
+    x += straightSign(h) * THEORY.front.straightShift * clamp(off * 1.6, 0, 1);
+    return { x: x, y: y };
+  }
+  // 後衛: 相手が打てる範囲のうち、前衛が守れない部分のまん中（角の二等分線）に、ベースラインの少し後ろで立つ。
+  // 範囲全体のまん中と、前衛の守備範囲を除いたまん中を coverWeight で混ぜる（前衛がいても相手はストレートを打てるため）
+  function backIdeal(h, phase){
+    var s = straightSign(h);
+    var sx = s < 0 ? 0 : W, cx = W - sx;
+    var y = L + THEORY.back.behind;
+    var b = Math.atan2(L - h.y, cx - h.x);
+    function xOn(a0){
+      var mid = (a0 + b) / 2;
+      return h.x + (y - h.y) / Math.tan(mid);
+    }
+    var full = xOn(Math.atan2(L - h.y, sx - h.x));
+    var f = frontIdeal(h, phase);
+    var w = clamp(Math.abs(h.x - W / 2) / (W / 2) * 1.6, 0, 1);
+    var cover = xOn(Math.atan2(f.y - h.y, f.x - s * THEORY.front.reach - h.x));
+    var k = THEORY.back.coverWeight * w;
+    return { x: full + (cover - full) * k, y: y };
+  }
+  // 相手前衛（見るだけ）: 味方後衛の位置から同じきまりで置く
+  function oppFront(ownBack){
+    var y = NET - THEORY.front.close;
+    var t = (y - ownBack.y) / (0 - ownBack.y);
+    var x = ownBack.x + (W / 2 - ownBack.x) * t;
+    x += (ownBack.x < W / 2 ? -1 : 1) * THEORY.front.straightShift;
+    return { x: x, y: y };
+  }
+
+  function describeHit(h){
+    var side = h.x < W / 2 ? "左" : "右";
+    var lat = Math.abs(h.x - W / 2);
+    var latText = lat < 1.2 ? "センター付近" : (lat > 3.6 ? "画面" + side + "のサイド寄り" : "画面" + side + "寄り");
+    var depthText = h.y < -0.4 ? "ベースラインの " + fmt(-h.y) + "m 後ろ" :
+                    (h.y > 0.4 ? "ベースラインより " + fmt(h.y) + "m 前" : "ベースライン付近");
+    return latText + "、" + depthText;
+  }
+  function crossName(h){
+    if(Math.abs(h.x - W / 2) < 1.2) return "センター";
+    return h.x < W / 2 ? "正クロス" : "逆クロス";
+  }
+
+  // ---------------- しくみを見る ----------------
+  var look = Court.create(document.getElementById("look-court"));
+  var PRESETS = THEORY.presets;
+  var hit = { x: PRESETS[0].x, y: PRESETS[0].y };
+  var phase = "opp";   // "opp" 相手後衛が打つ／"own" 味方後衛が打つ
+  var lookPieces = {
+    ob: Court.player(look, { side: "opp", role: "後", name: "打つ人", x: hit.x, y: hit.y, cls: "draggable" }),
+    of: Court.player(look, { side: "opp", role: "前", x: 7, y: NET - 3, cls: "is-ghost" }),
+    mf: Court.player(look, { side: "own", role: "前", name: "前衛", x: 3, y: NET + 3, reach: THEORY.front.reach }),
+    mb: Court.player(look, { side: "own", role: "後", name: "後衛", x: 8, y: L + 1 })
+  };
+  lookPieces.ob.setAttribute("tabindex", "0");
+  lookPieces.ob.setAttribute("role", "slider");
+  lookPieces.ob.setAttribute("aria-label", "相手の打つ位置（矢印キーで動かせます）");
+  lookPieces.mb.querySelector(".pl-name").textContent = "後衛";
+
+  var presetBox = document.getElementById("look-presets");
+  PRESETS.forEach(function(p, i){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip" + (i === 0 ? " active" : "");
+    b.textContent = p.label;
+    b.addEventListener("click", function(){
+      hit = { x: p.x, y: p.y };
+      setActive(i); drawLook(true);
+    });
+    presetBox.appendChild(b);
+  });
+  function setActive(i){
+    Array.prototype.forEach.call(presetBox.children, function(c, j){ c.classList.toggle("active", j === i); });
+  }
+
+  var phaseBox = document.getElementById("look-phase");
+  Array.prototype.forEach.call(phaseBox.querySelectorAll("button"), function(b){
+    b.addEventListener("click", function(){
+      phase = b.getAttribute("data-phase");
+      Array.prototype.forEach.call(phaseBox.querySelectorAll("button"), function(o){
+        o.classList.toggle("active", o === b);
+        o.setAttribute("aria-pressed", o === b ? "true" : "false");
+      });
+      drawLook(true);
+    });
+  });
+
+  var toggles = ["show-range", "show-front", "show-back", "show-reach"].reduce(function(o, id){
+    o[id] = document.getElementById(id);
+    o[id].addEventListener("change", function(){ drawLook(false); });
+    return o;
+  }, {});
+
+  function drawGuides(c, h, opt){
+    c.clear("guide");
+    var s = straightSign(h);
+    var sideX = s < 0 ? 0 : W;
+    if(opt.range){
+      Court.poly(c, "guide", [h, { x: 0, y: L }, { x: W, y: L }], "g-range");
+    }
+    if(opt.range && crossName(h) !== "センター"){
+      Court.poly(c, "guide", [h, { x: sideX, y: L }, { x: sideX - s * THEORY.straightLane, y: L }], "g-straight");
+      Court.line(c, "guide", h, { x: 0, y: L }, "g-edge");
+      Court.line(c, "guide", h, { x: W, y: L }, "g-edge");
+      Court.label(c, "guide", { x: sideX - s * 1.1, y: L - 1.6 }, "ストレート");
+    }
+    if(opt.front){
+      Court.line(c, "guide", h, CENTER_MARK, "g-center");
+      Court.dot(c, "guide", CENTER_MARK, 0.22, "g-ideal");
+    }
+    if(opt.back){
+      var bi = backIdeal(h, opt.phase);
+      Court.line(c, "guide", h, bi, "g-bisect");
+    }
+  }
+
+  function drawLook(animate){
+    var fi = frontIdeal(hit, phase), bi = backIdeal(hit, phase);
+    Court.move(lookPieces.ob, hit.x, hit.y, true);
+    Court.move(lookPieces.mf, fi.x, fi.y, !animate);
+    Court.move(lookPieces.mb, bi.x, bi.y, !animate);
+    var of = oppFront(bi);
+    Court.move(lookPieces.of, of.x, of.y, !animate);
+    lookPieces.mf.querySelector(".pl-reach").style.display = toggles["show-reach"].checked ? "" : "none";
+    drawGuides(look, hit, { range: toggles["show-range"].checked, front: toggles["show-front"].checked, back: toggles["show-back"].checked, phase: phase });
+    look.clear("shot");
+    var dn = frontDepth(phase);
+    var s = straightSign(hit) < 0 ? "左" : "右";
+    var cn = crossName(hit);
+    document.getElementById("look-readout").innerHTML =
+      "<p class=\"ro-hit\"><b>" + cn + "</b>　" + describeHit(hit) + "</p>" +
+      "<dl>" +
+      "<dt>前衛</dt><dd>ネットから <b>" + fmt(dn) + "m</b>。" +
+        (cn === "センター" ? "センターマークへの線の上に立ち、どちらにも動ける構え。" :
+          "線の上に立ち、ほんの少しだけ画面" + s + "（ストレート側）へ。外へ寄りすぎるとセンターが空く。") +
+        (phase === "own" ? "味方後衛が打つ場面なので、<b>一歩下がって</b>守りに備える。" :
+          "相手後衛が打つ場面なので、<b>ネットに詰めて</b>ボレーをねらう。") +
+      "</dd>" +
+      "<dt>後衛</dt><dd>ベースラインの約 " + fmt(THEORY.back.behind) + "m 後ろ。" +
+        (cn === "センター" ? "相手が打てる範囲のまん中で、左右どちらにも動ける位置。" :
+          "前衛がストレート側を守るぶん、画面" + (s === "左" ? "右" : "左") + "（クロス側）に寄って、クロスとセンターに備える。") + "</dd>" +
+      "</dl>";
+  }
+
+  function dragOn(c, g, onMove, onEnd, bounds){
+    var dragging = false;
+    function to(evt){
+      var p = c.point(evt);
+      onMove({ x: clamp(p.x, bounds.x0, bounds.x1), y: clamp(p.y, bounds.y0, bounds.y1) });
+    }
+    function down(evt){
+      if(g.classList.contains("locked")) return;
+      dragging = true; evt.preventDefault(); to(evt);
+    }
+    g.addEventListener("pointerdown", down);
+    c.svg.addEventListener("pointerdown", function(evt){
+      if(dragging || g.classList.contains("locked") || evt.target.closest(".pl")) return;
+      dragging = true; to(evt);
+    });
+    window.addEventListener("pointermove", function(evt){ if(dragging){ evt.preventDefault(); to(evt); } }, { passive: false });
+    window.addEventListener("pointerup", function(){ if(dragging){ dragging = false; if(onEnd) onEnd(); } });
+    g.addEventListener("keydown", function(evt){
+      if(g.classList.contains("locked")) return;
+      var k = { ArrowLeft: [-0.25, 0], ArrowRight: [0.25, 0], ArrowUp: [0, -0.25], ArrowDown: [0, 0.25] }[evt.key];
+      if(!k) return;
+      evt.preventDefault();
+      onMove({ x: clamp(g._x + k[0], bounds.x0, bounds.x1), y: clamp(g._y + k[1], bounds.y0, bounds.y1) });
+    });
+  }
+  dragOn(look, lookPieces.ob, function(p){ hit = p; setActive(-1); drawLook(false); }, null,
+    { x0: -1.5, x1: W + 1.5, y0: -3, y1: NET - 3.5 });
+
+  drawLook(false);
+
+  // ---------------- 立ってみる ----------------
+  var quiz = Court.create(document.getElementById("quiz-court"));
+  var Q = { n: 0, total: 10, score: 0, list: [], answered: false, results: [] };
+  var qp = {
+    ob: Court.player(quiz, { side: "opp", role: "後", name: "打つ人", x: 2, y: 0 }),
+    of: Court.player(quiz, { side: "opp", role: "前", x: 7, y: NET - 3, cls: "is-ghost" }),
+    mate: Court.player(quiz, { side: "own", role: "後", x: 8, y: L + 1, cls: "is-ghost" }),
+    me: Court.player(quiz, { side: "own", role: "?", name: "あなた", x: W / 2, y: NET + 7, cls: "draggable is-focus" })
+  };
+  qp.me.setAttribute("tabindex", "0");
+  qp.me.setAttribute("aria-label", "自分の駒（矢印キーで動かせます）");
+  var ideal = null;
+  var E = {
+    count: document.getElementById("quiz-count"), dots: document.getElementById("quiz-dots"),
+    role: document.getElementById("quiz-role"), scene: document.getElementById("quiz-scene"),
+    answer: document.getElementById("quiz-answer"), next: document.getElementById("quiz-next"),
+    verdict: document.getElementById("quiz-verdict"), result: document.getElementById("quiz-result"),
+    score: document.getElementById("quiz-score"), rtitle: document.getElementById("quiz-result-title"),
+    rtext: document.getElementById("quiz-result-text"), best: document.getElementById("quiz-best"),
+    howto: document.getElementById("quiz-howto")
+  };
+
+  function rand(a, b){ return a + Math.random() * (b - a); }
+  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+  function makeList(){
+    var list = [];
+    var scenes = THEORY.scenes.slice();
+    for(var i = 0; i < Q.total; i++){
+      var sc = scenes.splice(Math.floor(Math.random() * scenes.length), 1)[0];
+      if(!scenes.length) scenes = THEORY.scenes.slice();
+      var mirror = Math.random() < 0.5;
+      var x = rand(sc.x[0], sc.x[1]);
+      if(mirror) x = W - x;
+      var phase = sc.phase || "opp";
+      // 味方後衛が打つ場面は、後衛が打つ人なので前衛の問題にする
+      list.push({ scene: sc, h: { x: x, y: rand(sc.y[0], sc.y[1]) },
+        role: phase === "own" ? "front" : (i % 2 === 0 ? "front" : "back"), phase: phase });
+    }
+    return list;
+  }
+  function startQuiz(){
+    Q.n = 0; Q.score = 0; Q.list = makeList(); Q.results = [];
+    E.result.hidden = true;
+    E.dots.innerHTML = new Array(Q.total + 1).join("<span></span>");
+    showQuestion();
+  }
+  function showQuestion(){
+    var item = Q.list[Q.n];
+    var h = item.h;
+    Q.answered = false;
+    quiz.clear("guide"); quiz.clear("hint"); quiz.clear("shot");
+    Court.move(qp.ob, h.x, h.y, false);
+    var fi = frontIdeal(h, item.phase), bi = backIdeal(h, item.phase);
+    ideal = item.role === "front" ? fi : bi;
+    var mate = item.role === "front" ? bi : fi;
+    qp.mate.querySelector(".pl-text").textContent = item.role === "front" ? "後" : "前";
+    Court.move(qp.mate, mate.x, mate.y, false);
+    var of = oppFront(bi);
+    Court.move(qp.of, of.x, of.y, false);
+    var start = item.role === "front" ? { x: W / 2, y: NET + 5 } : { x: W / 2, y: L - 2 };
+    Court.move(qp.me, start.x, start.y, true);
+    qp.me.classList.remove("locked");
+    E.count.textContent = "第" + (Q.n + 1) + "問 / " + Q.total;
+    Array.prototype.forEach.call(E.dots.children, function(d, i){
+      d.className = i < Q.n ? (Q.results[i] >= 6 ? "done-correct" : "done-wrong") : (i === Q.n ? "current" : "");
+    });
+    E.role.innerHTML = "あなたは <b>" + (item.role === "front" ? "前衛" : "後衛") + "</b>";
+    E.scene.innerHTML = item.scene.text + "<br><span class=\"sub\">（" + (crossName(h) === "センター" ? "" : crossName(h) + "・") + describeHit(h) + "）</span>";
+    E.verdict.hidden = true;
+    E.answer.hidden = false; E.next.hidden = true;
+    E.howto.hidden = false;
+  }
+  dragOn(quiz, qp.me, function(p){ if(!Q.answered) Court.move(qp.me, p.x, p.y, true); }, null,
+    { x0: -1.5, x1: W + 1.5, y0: NET + 0.4, y1: L + 3 });
+
+  function advice(item, me){
+    var h = item.h, tips = [];
+    var dy = me.y - ideal.y;                 // 正なら下がりすぎ
+    var s = straightSign(h);
+    var dx = (me.x - ideal.x) * s;            // 正ならストレート側に寄りすぎ
+    var tolY = item.role === "front" ? 0.5 : 0.7, tolX = item.role === "front" ? 0.4 : 0.6;
+    if(item.role === "front"){
+      if(dy > tolY) tips.push("ネットから遠すぎます。あと約 " + fmt(dy) + "m <b>前へ</b>。" +
+        (item.phase === "own" ? "味方後衛が打つ場面でも、下がるのは一歩です。" : "相手後衛が打つ場面は、ネットに詰めてボレーをねらいます。"));
+      if(dy < -tolY) tips.push("ネットに近すぎます。あと約 " + fmt(-dy) + "m <b>下がる</b>。" +
+        (item.phase === "own" ? "味方後衛が打つ場面は、一歩下がって守りに備えます。" : "詰めすぎると、ロブや足元のボールに届きません。"));
+      if(dx > tolX) tips.push("ストレート側に寄りすぎです（約 " + fmt(dx) + "m）。これではセンターを抜かれます。");
+      if(dx < -tolX) tips.push("センター側に寄りすぎです（約 " + fmt(-dx) + "m）。<b>ストレートを抜かれます</b>。打点とセンターマークを結んだ線まで戻りましょう。");
+    } else {
+      if(dy > tolY) tips.push("後ろに下がりすぎです。約 " + fmt(dy) + "m 前へ。");
+      if(dy < -tolY) tips.push("前に出すぎです。深いボールに振り遅れます。約 " + fmt(-dy) + "m 下がる。");
+      if(Math.abs(me.x - ideal.x) > tolX){
+        var dir = me.x > ideal.x ? "左" : "右";
+        tips.push("画面の" + dir + "へ約 " + fmt(Math.abs(me.x - ideal.x)) + "m。相手が打てる範囲のまん中に立ちます。");
+      }
+    }
+    return tips;
+  }
+
+  E.answer.addEventListener("click", function(){
+    if(Q.answered) return;
+    Q.answered = true;
+    var item = Q.list[Q.n];
+    var me = { x: qp.me._x, y: qp.me._y };
+    var d = dist(me, ideal);
+    var tol = THEORY.tolerance[item.role];
+    var pts = d <= tol[0] ? 10 : d <= tol[1] ? 6 : d <= tol[2] ? 3 : 0;
+    Q.score += pts; Q.results.push(pts);
+    qp.me.classList.add("locked");
+    drawGuides(quiz, item.h, { range: true, front: item.role === "front", back: item.role === "back", phase: item.phase });
+    Court.dot(quiz, "hint", ideal, 0.62, item.role === "front" ? "g-ideal" : "g-ideal-back");
+    Court.dot(quiz, "hint", ideal, tol[0], "g-band");
+    Court.line(quiz, "hint", me, ideal, "g-err");
+    var tips = advice(item, me);
+    var head = pts === 10 ? "◎ ぴったり" : pts === 6 ? "○ おしい" : pts === 3 ? "△ もう少し" : "× ずれています";
+    E.verdict.className = "verdict " + (pts >= 6 ? "is-good" : "is-bad");
+    E.verdict.innerHTML =
+      "<p class=\"v-head\">" + head + "<span>（" + pts + "点・理想の位置から " + fmt(d) + "m）</span></p>" +
+      (tips.length ? "<ul>" + tips.map(function(t){ return "<li>" + t + "</li>"; }).join("") + "</ul>" : "") +
+      "<p class=\"v-why\">" + (item.role === "front" ? THEORY.why.front : THEORY.why.back) +
+        (item.role === "front" ? "<br>" + (item.phase === "own" ? THEORY.why.frontOwn : THEORY.why.frontOpp) : "") + "</p>" +
+      (item.scene.note ? "<p class=\"v-why\">" + item.scene.note + "</p>" : "");
+    E.verdict.hidden = false;
+    E.answer.hidden = true;
+    E.howto.hidden = true;
+    E.next.hidden = false;
+    E.next.textContent = Q.n + 1 < Q.total ? "次の問題へ" : "結果を見る";
+    E.next.focus();
+  });
+
+  E.next.addEventListener("click", function(){
+    Q.n++;
+    if(Q.n < Q.total){ showQuestion(); return; }
+    E.dots.lastChild.className = Q.results[Q.total - 1] >= 6 ? "done-correct" : "done-wrong";
+    E.result.hidden = false;
+    E.next.hidden = true;
+    E.score.textContent = Q.score;
+    E.rtitle.textContent = Q.score >= 80 ? "立ち位置はばっちり" : Q.score >= 50 ? "だいたいつかめています" : "線の引き方から確かめよう";
+    E.rtext.textContent = Q.score >= 80 ? "コートでも、相手が打つ瞬間に同じ場所へ動けているか、練習で確かめてみましょう。" :
+      Q.score >= 50 ? "ずれの多かった役割（前衛・後衛）の説明を読み直して、もう一度挑戦しましょう。" :
+      "「しくみを見る」で相手の駒を動かし、前衛の線と後衛の線がどう動くかを見てから再挑戦しましょう。";
+    var best = 0;
+    try{ best = Number(localStorage.getItem("softtennis.position.best") || 0); }catch(e){}
+    if(Q.score > best){
+      best = Q.score;
+      try{ localStorage.setItem("softtennis.position.best", String(best)); }catch(e){}
+      E.best.textContent = "自己ベスト更新！（" + best + "点）";
+    } else {
+      E.best.textContent = "自己ベスト: " + best + "点（この端末）";
+    }
+    E.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  document.getElementById("quiz-restart").addEventListener("click", function(){
+    startQuiz();
+    document.getElementById("panel-quiz").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // ---------------- タブ ----------------
+  var tabs = [document.getElementById("tab-look"), document.getElementById("tab-quiz")];
+  function selectTab(i){
+    tabs.forEach(function(t, j){
+      t.setAttribute("aria-selected", i === j ? "true" : "false");
+      document.getElementById(t.getAttribute("aria-controls")).hidden = i !== j;
+    });
+    if(i === 1 && !Q.list.length) startQuiz();
+    try{ localStorage.setItem("softtennis.position.tab", String(i)); }catch(e){}
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener("click", function(){ selectTab(i); });
+    t.addEventListener("keydown", function(evt){
+      if(evt.key === "ArrowRight" || evt.key === "ArrowLeft"){ var j = 1 - i; tabs[j].focus(); selectTab(j); }
+    });
+  });
+  if(location.hash === "#quiz") selectTab(1);
+})();
+</script>
+</body>
+</html>
