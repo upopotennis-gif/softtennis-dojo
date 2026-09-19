@@ -760,7 +760,7 @@ main > * + *{ margin-top:16px; }
         <div class="figure-grid">
           <div class="court-wrap">
             <svg id="look-court" role="img" aria-label="コート図。上が相手コート、下が味方コート。青い駒が相手、オレンジの駒が味方。白い線がセオリー線"></svg>
-            <p class="drag-hint">青い<b>「後」</b>（打つ人）と、オレンジの味方の駒をドラッグできます。味方の後衛を動かすと、相手の前衛もついて動きます。</p>
+            <p class="drag-hint">青い<b>「後」</b>（打つ人）と、オレンジの味方の駒をドラッグできます。打つ人を動かすと味方の前衛が、味方の後衛を動かすと相手の前衛が、ついて動きます。</p>
           </div>
           <div class="panel">
             <h2 class="panel-title">展開（手前＝味方から見た左右）</h2>
@@ -771,7 +771,7 @@ main > * + *{ margin-top:16px; }
 
             <div class="readout" id="look-readout" aria-live="polite"></div>
 
-            <h2 class="panel-title">味方前衛の前後</h2>
+            <h2 class="panel-title">味方前衛の前後（左右は打つ人に合わせて自動）</h2>
             <div class="chips" id="look-own-depth">
               <button type="button" class="chip active" data-depth="net" aria-pressed="true">ネット（相手が打つ・詰める）</button>
               <button type="button" class="chip" data-depth="step" aria-pressed="false">一歩下がる（味方が打つ）</button>
@@ -814,7 +814,7 @@ main > * + *{ margin-top:16px; }
 
       <div class="card rules">
         <h2>立ち位置の考え方</h2>
-        <ol><li><strong>基準の位置から考える。</strong> 雁行陣では、前衛＝ネットからラケット1.5〜2本分、後衛＝ベースラインからラケット1本分後ろが基準。左右の位置は展開（正クロス・逆クロス・右ストレート・左ストレート）ごとに決まっている。ここから相手の位置・体勢に合わせてずらす。</li><li><strong>セオリー線を引く。</strong> 打つ人の打点から、こちらのベースラインの左端・センター・右端へ3本の線を引く。外側の2本の間が「球が来る範囲」、外は「デッドゾーン（球が来ない所）」。</li><li><strong>守備範囲はラケット本数で見る。</strong> 自分から「近い外側の線」と「センターの線」まで、ラケット何本分かを確かめる。前衛は1.5本以内ならカバー圏内・2.5本以内なら踏み込みで届く。後衛は2本・3本。それより遠い所が「穴」になる。</li><li><strong>前衛は「だれが打つか」で前後する（顧問の方針）。</strong> 相手後衛が打つときは基準の位置まで詰め、味方後衛が打つときは一歩下がる。</li><li><strong>相手前衛は、こちらの後衛の位置で決まる。</strong> 相手前衛も同じ考え方で、こちらの後衛の打点と相手コートのセンターマークを結ぶ線を目安に立つ。こちらの後衛が動くと、相手前衛の立ち位置も変わる。</li></ol>
+        <ol><li><strong>基準の位置から考える。</strong> 雁行陣では、前衛＝ネットからラケット1.5〜2本分、後衛＝ベースラインからラケット1本分後ろが基準。左右の位置は展開（正クロス・逆クロス・右ストレート・左ストレート）ごとに決まっている。ここから相手の位置・体勢に合わせてずらす。</li><li><strong>セオリー線を引く。</strong> 打つ人の打点から、こちらのベースラインの左端・センター・右端へ3本の線を引く。外側の2本の間が「球が来る範囲」、外は「デッドゾーン（球が来ない所）」。</li><li><strong>守備範囲はラケット本数で見る。</strong> 自分から「近い外側の線」と「センターの線」まで、ラケット何本分かを確かめる。前衛は1.5本以内ならカバー圏内・2.5本以内なら踏み込みで届く。後衛は2本・3本。それより遠い所が「穴」になる。</li><li><strong>前衛は「だれが打つか」で前後する（顧問の方針）。</strong> 相手後衛が打つときは基準の位置まで詰め、味方後衛が打つときは一歩下がる。</li><li><strong>前衛は、相手の後衛の位置で決まる（両チームとも）。</strong> 前衛は、相手後衛の打点と自分のコートのセンターマークを結ぶ線を目安に、展開の基準と同じだけずらして立つ。相手後衛が動けば、前衛の立ち位置も変わる。</li></ol>
         <p class="drag-hint">考え方の出典：<a href="https://omicreate.github.io/jinkei-lab/" target="_blank" rel="noopener">ソフトテニスIQ｜陣形ラボ</a>（基準配置・セオリー線・ラケット本数の目安）。前衛の「詰める・一歩下がる」は顧問の方針です。</p>
       </div>
     </section>
@@ -1068,6 +1068,19 @@ var Court = (function(){
     return { x: clamp(lineXFromOwnBack(ownBack, y) + shift, -0.5, W + 0.5), y: y };
   }
 
+  // 味方前衛も同じ考え方：打つ人（相手後衛）の打点と味方のセンターマークを結ぶ線から、基準配置と同じだけずらす
+  var OWN_CENTER_MARK = { x: W / 2, y: L };
+  function lineXFromHitter(h, stroke, y){
+    var c = { x: h.x + (stroke === "back" ? 1 : -1) * THEORY.contact, y: h.y };
+    return c.x + (y - c.y) / (OWN_CENTER_MARK.y - c.y) * (OWN_CENTER_MARK.x - c.x);
+  }
+  function ownFrontAuto(tk, hitter, stroke, depthKey){
+    var t = byId(THEORY.tenkai, tk);
+    var shift = t.mf - lineXFromHitter({ x: t.ob, y: OPP_BACK_Y }, "fore", NET + DEPTH.net);
+    var y = NET + DEPTH[depthKey || "net"];
+    return { x: clamp(lineXFromHitter(hitter, stroke, y) + shift, -0.5, W + 0.5), y: y };
+  }
+
   // ---------------- セオリー線 ----------------
   // 相手（上側）は味方の方を向いて打つので、右利きのフォアの打点は画面の左側（-x）、バックは右側
   function contactPoint(h, stroke){
@@ -1148,6 +1161,11 @@ var Court = (function(){
   pieces.mf.setAttribute("aria-label", "味方の駒。矢印キーで動かせます");
   pieces.mb.setAttribute("aria-label", "味方の駒。矢印キーで動かせます");
 
+  function autoOwnFront(){
+    if(byId(THEORY.forms, S.form).id !== "gankou") return;
+    var a = ownFrontAuto(S.tenkai, pos.ob, S.stroke, S.ownDepth);
+    pos.mf.x = a.x; pos.mf.y = a.y;
+  }
   function resetPositions(){
     var o = oppBase(S.tenkai), m = ownBase(S.tenkai, S.form, null, byId(THEORY.forms, S.form).id === "gankou" ? S.ownDepth : null);
     pos = { ob: o.ob, of: o.of, mf: m.mf, mb: m.mb };
@@ -1183,11 +1201,7 @@ var Court = (function(){
         Array.prototype.forEach.call(box.querySelectorAll("button"), function(o){
           o.classList.toggle("active", o === b); o.setAttribute("aria-pressed", o === b ? "true" : "false");
         });
-        if(key === "ownDepth"){
-          var m = ownBase(S.tenkai, S.form, null, byId(THEORY.forms, S.form).id === "gankou" ? S.ownDepth : null);
-          pos.mf.y = m.mf.y;
-          if(m.mf.role === "front" && m.mb.role === "front") pos.mb.y = m.mb.y;
-        }
+        if(key === "ownDepth" || key === "stroke"){ autoOwnFront(); }
         drawLook(true);
       });
     });
@@ -1255,7 +1269,7 @@ var Court = (function(){
   }
   var OPP_AREA = { x0: -1.5, x1: W + 1.5, y0: -3, y1: NET - 3.5 };
   var OWN_AREA = { x0: -1.5, x1: W + 1.5, y0: NET + 0.4, y1: L + 3 };
-  dragOn(look, pieces.ob, function(p){ pos.ob = p; drawLook(false); }, OPP_AREA);
+  dragOn(look, pieces.ob, function(p){ pos.ob = p; autoOwnFront(); drawLook(false); }, OPP_AREA);
   dragOn(look, pieces.mf, function(p){ pos.mf.x = p.x; pos.mf.y = p.y; drawLook(false); }, OWN_AREA);
   dragOn(look, pieces.mb, function(p){ pos.mb.x = p.x; pos.mb.y = p.y; drawLook(false); }, OWN_AREA);
 
