@@ -606,6 +606,13 @@ button.btn{ border-radius:6px; }
 .legend i.opp{ background:#243a55; }
 .legend i.bar{ width:20px; height:0; border-radius:0; border:0; border-top:3px dashed var(--yamabuki); }
 .legend i.bar.solid{ border-top-style:solid; border-top-color:var(--ink-soft); }
+
+/* ポジション練習（陣形ラボの考え方） */
+.g-dead{ fill:rgba(10,20,15,.34); stroke:none; }
+.g-edge-strong{ stroke:#f4f4f4; stroke-width:.07; }
+.g-contact{ fill:#fff; stroke:#243a55; stroke-width:.06; }
+.g-reach-cover{ fill:rgba(255,255,255,.10); stroke:rgba(255,255,255,.75); stroke-width:.04; }
+.g-reach-stretch{ fill:none; stroke:rgba(255,255,255,.55); stroke-width:.04; stroke-dasharray:.18 .14; }
 /* ==== セオリー講座・ポジション練習の部品 ==== */
 .stage{ max-width:760px; }
 main > * + *{ margin-top:16px; }
@@ -718,6 +725,13 @@ main > * + *{ margin-top:16px; }
 .think-open{ display:inline-block; font-size:.84rem; font-weight:700; color:var(--ai); border-bottom:1px dashed var(--ai); }
 .think[open] .think-open{ display:none; }
 .think p{ margin:8px 0 0; }
+.tier{ display:inline-block; font-size:.72rem; font-weight:700; padding:0 7px; border-radius:999px; margin-left:4px; vertical-align:.08em; }
+.tier-cover{ background:var(--wakatake-bg); color:var(--wakatake); }
+.tier-stretch{ background:var(--marker); color:var(--yamabuki-deep); }
+.tier-open{ background:var(--kobai-bg); color:var(--kobai); }
+.readout .hole{ margin:8px 0 0; padding-top:6px; border-top:1px dashed var(--line); }
+.readout .ro-note{ margin:6px 0 0; font-size:.78rem; color:var(--ink-soft); line-height:1.6; }
+.rules .drag-hint a{ color:var(--ai); }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -728,7 +742,7 @@ main > * + *{ margin-top:16px; }
   <header class="masthead">
     <div class="rod"><span class="knob"></span><span class="knob"></span></div>
     <h1><span class="h1-name">ソフトテニス道場</span> <span class="hl">ポジション練習</span></h1>
-    <p>相手が打つ位置が変われば、前衛と後衛の立つ位置も変わります。<br>まず「しくみを見る」で線の引き方を確かめ、「立ってみる」で自分の立ち位置を当ててみましょう。</p>
+    <p>陣形の基準の位置から、相手が打てる範囲（セオリー線）と、届かない所（穴）を見てみましょう。<br>「しくみを見る」で駒を動かして確かめ、「立ってみる」で基準の位置を当ててみましょう。</p>
     <div class="rod" style="margin-top:16px"><span class="knob"></span><span class="knob"></span></div>
   </header>
 
@@ -745,31 +759,43 @@ main > * + *{ margin-top:16px; }
       <div class="card">
         <div class="figure-grid">
           <div class="court-wrap">
-            <svg id="look-court" role="img" aria-label="コート図。上が相手コート、下が味方コート。青い駒が打つ相手、オレンジの駒が味方"></svg>
-            <p class="drag-hint">青い<b>「後」</b>（相手後衛）をドラッグして、打つ位置を変えられます。</p>
+            <svg id="look-court" role="img" aria-label="コート図。上が相手コート、下が味方コート。青い駒が相手、オレンジの駒が味方。白い線がセオリー線"></svg>
+            <p class="drag-hint">青い<b>「後」</b>（打つ人）と、オレンジの味方の駒をドラッグできます。</p>
           </div>
           <div class="panel">
-            <h2 class="panel-title">相手の打つ位置</h2>
-            <div class="chips" id="look-presets"></div>
+            <h2 class="panel-title">展開（手前＝味方から見た左右）</h2>
+            <div class="chips" id="look-tenkai"></div>
+
+            <h2 class="panel-title">味方の陣形</h2>
+            <div class="chips" id="look-form"></div>
 
             <div class="readout" id="look-readout" aria-live="polite"></div>
 
-            <h2 class="panel-title">どちらが打つ場面か</h2>
+            <h2 class="panel-title">前衛：どちらが打つ場面か</h2>
             <div class="chips" id="look-phase">
               <button type="button" class="chip active" data-phase="opp" aria-pressed="true">相手後衛が打つ（詰める）</button>
               <button type="button" class="chip" data-phase="own" aria-pressed="false">味方後衛が打つ（一歩下がる）</button>
             </div>
 
-            <h2 class="panel-title">表示する線</h2>
+            <h2 class="panel-title">打つ人の打球面</h2>
+            <div class="chips" id="look-stroke">
+              <button type="button" class="chip active" data-stroke="fore" aria-pressed="true">フォア</button>
+              <button type="button" class="chip" data-stroke="back" aria-pressed="false">バック</button>
+            </div>
+
+            <div class="quiz-actions" style="margin:0 0 14px">
+              <button type="button" class="btn btn-secondary" id="look-reset">基準の位置に戻す</button>
+            </div>
+
+            <h2 class="panel-title">表示</h2>
             <div class="toggles">
-              <label><input type="checkbox" id="show-range" checked> 相手が打てる範囲</label>
-              <label><input type="checkbox" id="show-front" checked> 前衛の線（打点とセンターマーク）</label>
-              <label><input type="checkbox" id="show-back" checked> 後衛の目印（サービスサイドライン）</label>
-              <label><input type="checkbox" id="show-reach" checked> 前衛の守備範囲（目安）</label>
+              <label><input type="checkbox" id="show-theory" checked> セオリー線と、球が来る範囲</label>
+              <label><input type="checkbox" id="show-dead" checked> デッドゾーン（球が来ない所）</label>
+              <label><input type="checkbox" id="show-reach" checked> 味方の守備範囲（ラケット本数の輪）</label>
             </div>
             <ul class="legend">
-              <li><i class="bar" style="border-top-color:#c9a227"></i>前衛の線</li>
-              <li><i class="bar" style="border-top-color:#8fb0e8"></i>後衛の目印</li>
+              <li><i class="bar solid"></i>外側のセオリー線</li>
+              <li><i class="bar" style="border-top-color:#c9a227"></i>センターの線</li>
               <li><i class="own"></i>味方</li>
               <li><i class="opp"></i>相手</li>
             </ul>
@@ -778,8 +804,9 @@ main > * + *{ margin-top:16px; }
       </div>
 
       <div class="card rules">
-        <h2>立ち位置を決めるきまり</h2>
-        <ol><li><strong>前衛は「相手の打点」と「味方のセンターマーク」を結んだ線の上に立つ。</strong> 打点が動いたら、線ごと動く。ストレートが気になっても、外へ寄りすぎない（センターを空けるほうが損）。</li><li><strong>前衛のネットからの距離は「だれが打つか」で決める。</strong> 相手後衛が打つときは<strong>ネットに詰める</strong>（この図では約1.5m）。味方後衛が打つときは<strong>一歩下がる</strong>（約0.8m）。この「詰める・下がる」をラリー中くり返す。</li><li><strong>後衛はサービスサイドラインを目印に立つ。</strong> 正クロス展開も逆クロス展開も、<strong>右足をサービスサイドライン</strong>に置くのが基本。打ったら、次の打点を見てこの位置へ戻る。</li><li><strong>ストレート展開では、後衛は打ち合っている側のサービスサイドラインの真正面に立つ。</strong> 前衛の線はクロス展開と同じなので、前衛は後衛の前に立つ形になる。ストレートを気にして外へ寄りすぎない。</li></ol>
+        <h2>立ち位置の考え方</h2>
+        <ol><li><strong>基準の位置から考える。</strong> 雁行陣では、前衛＝ネットからラケット1.5〜2本分、後衛＝ベースラインからラケット1本分後ろが基準。左右の位置は展開（正クロス・逆クロス・右ストレート・左ストレート）ごとに決まっている。ここから相手の位置・体勢に合わせてずらす。</li><li><strong>セオリー線を引く。</strong> 打つ人の打点から、こちらのベースラインの左端・センター・右端へ3本の線を引く。外側の2本の間が「球が来る範囲」、外は「デッドゾーン（球が来ない所）」。</li><li><strong>守備範囲はラケット本数で見る。</strong> 自分から「近い外側の線」と「センターの線」まで、ラケット何本分かを確かめる。前衛は1.5本以内ならカバー圏内・2.5本以内なら踏み込みで届く。後衛は2本・3本。それより遠い所が「穴」になる。</li><li><strong>前衛は「だれが打つか」で前後する（顧問の方針）。</strong> 相手後衛が打つときは基準の位置まで詰め、味方後衛が打つときは一歩下がる。</li></ol>
+        <p class="drag-hint">考え方の出典：<a href="https://omicreate.github.io/jinkei-lab/" target="_blank" rel="noopener">ソフトテニスIQ｜陣形ラボ</a>（基準配置・セオリー線・ラケット本数の目安）。前衛の「詰める・一歩下がる」は顧問の方針です。</p>
       </div>
     </section>
 
@@ -797,7 +824,7 @@ main > * + *{ margin-top:16px; }
           <div class="panel">
             <p class="quiz-role" id="quiz-role"></p>
             <p class="quiz-scene" id="quiz-scene"></p>
-            <p class="drag-hint" id="quiz-howto">オレンジの<b>「？」</b>の駒を、自分が立つと思う場所までドラッグします（コートをタップしても動きます。矢印キーでも動かせます）。</p>
+            <p class="drag-hint" id="quiz-howto">オレンジの<b>「？」</b>の駒を、基準の位置だと思う場所までドラッグします（コートをタップしても動きます。矢印キーでも動かせます）。</p>
             <div class="quiz-actions">
               <button type="button" class="btn btn-primary" id="quiz-answer">ここに立つ</button>
               <button type="button" class="btn btn-primary" id="quiz-next" hidden>次の問題へ</button>
@@ -969,213 +996,234 @@ var Court = (function(){
 })();
 
 /* ポジション練習（position.html）
- * 立ち位置の計算は THEORY にまとめてある。指導方針に合わせて数値を変えるときはここだけ直す。
+ * 考え方は「ソフトテニスIQ｜陣形ラボ」（https://omicreate.github.io/jinkei-lab/）をもとにしている（2026-09-20、顧問の指示）。
+ *   ・基準配置：前衛＝ネットからラケット1.75本分、後衛＝ベースラインからラケット1本分後ろ。展開ごとの左右の位置は陣形ラボの値
+ *   ・セオリー線：打つ人の打点（体の横 contact m）から、相手コートのベースラインの左端・センター・右端へ引く3本の線
+ *   ・守備範囲：守る人から「近い外側の線」と「センターの線」までがラケット何本分か。役割ごとの本数でカバー／踏み込み／リーチ外
+ * 前衛の「相手が打つ＝詰める／味方が打つ＝一歩下がる」は顧問の方針（2026-09-18）。
+ * 数値は THEORY（読み物データ/立ち位置.json）にまとめてある。
  */
 (function(){
   "use strict";
   var W = Court.W, L = Court.L, NET = Court.NET;
-  var CENTER_MARK = { x: W / 2, y: L };
-
-  var THEORY = {"front":{"close":1.5,"step":0.8,"straightShift":0.2,"reach":1.8},"back":{"behind":0.8,"foot":0.3},"straightLane":2.2,"tolerance":{"front":[0.6,1.2,2.0],"back":[1.0,1.8,2.8]},"presets":[{"label":"正クロス展開","x":1.6,"y":-1.0},{"label":"逆クロス展開","x":9.4,"y":-1.0},{"label":"右ストレート展開","x":9.4,"y":-1.0,"tenkai":"straight"},{"label":"左ストレート展開","x":1.6,"y":-1.0,"tenkai":"straight"},{"label":"センター","x":5.5,"y":-0.8},{"label":"追い込まれた（かなり深い）","x":1.0,"y":-2.6},{"label":"前に入って打つ（浅い）","x":2.4,"y":2.8}],"scenes":[{"text":"相手後衛が、クロスの深いボールをベースラインの後ろで打とうとしている。","x":[0.8,2.2],"y":[-1.6,-0.6],"phase":"opp"},{"text":"味方の深いロブで相手後衛が走らされ、ベースラインのかなり後ろで打とうとしている。","x":[0.3,1.6],"y":[-3.0,-2.0],"note":"相手後衛が打つ場面です。苦しい体勢の相手からは甘い返球が来やすいので、前衛はネットに詰めてボレー・スマッシュをねらいます。","phase":"opp"},{"text":"相手後衛が、ベースライン付近のセンターから打とうとしている。","x":[4.6,6.3],"y":[-1.0,0.0],"note":"センターからの打球はストレートとクロスの区別がなくなります。前衛はセンターマークへの線の上に立ちます。","phase":"opp"},{"text":"味方の返球が浅くなり、相手後衛がサービスライン近くまで前に入って打とうとしている。","x":[1.6,3.4],"y":[2.0,3.6],"note":"相手が前に入って強く打ってくる場面でも、打つのは相手です。前衛はネットに詰めて、ボレーでコースを消します。","phase":"opp"},{"text":"相手後衛が、サイドラインの外まで振られてから打とうとしている。","x":[-1.0,0.2],"y":[-1.2,-0.3],"note":"打点がサイドの外に出ると、ストレートのコースが開きやすくなります。前衛はストレートを消す意識を強めます。","phase":"opp"},{"text":"相手後衛が、クロス寄りのベースライン上から打とうとしている。","x":[2.2,3.4],"y":[-0.5,0.3],"phase":"opp"},{"text":"味方後衛が、クロスへ深いボールを打とうとしている。相手後衛はベースライン付近で待っている。","x":[0.8,2.4],"y":[-1.2,-0.3],"phase":"own","note":"味方が打つ場面では、前衛は一歩下がります。相手のボレーやスマッシュ、足元へのボールに備えるためです。"},{"text":"味方後衛が、センターへ返そうとしている。相手後衛はベースラインの後ろで待っている。","x":[4.6,6.3],"y":[-1.6,-0.6],"phase":"own","note":"味方が打ったあと、相手が打つ番になったら、また詰め直します。前衛は「詰める・一歩下がる」をくり返します。"},{"text":"味方後衛が、逆クロスへ打とうとしている。相手後衛はベースライン付近で待っている。","x":[8.6,10.2],"y":[-1.2,-0.3],"phase":"own"},{"text":"ストレート展開。味方後衛と相手後衛が、同じ側のサイドライン沿いにストレートで打ち合っている。相手後衛が打とうとしている。","x":[0.8,2.2],"y":[-1.4,-0.4],"phase":"opp","tenkai":"straight","note":"ストレート展開でも、前衛が立つ線（相手の打点とセンターマークを結ぶ線）はクロス展開と同じです。前衛は後衛の前に立つ形になります。"},{"text":"ストレート展開。相手後衛が、ストレートの位置から打とうとしている。味方後衛は同じ側のベースライン付近にいる。","x":[8.8,10.2],"y":[-1.4,-0.4],"phase":"opp","tenkai":"straight","note":"後衛は、打ち合っている側のサービスサイドラインの真正面に立ちます。"}],"why":{"front":"前衛は「相手の打点」と「味方コートのセンターマーク」を結んだ線の上に立つと、ストレートにもセンターにも手が届きます。ストレートを怖がって外へ寄りすぎると、センターが大きく空きます。","back":"後衛はサービスサイドラインを目印に立ちます。クロス展開（正クロス・逆クロス）では、打ち合う側のサービスサイドラインに右足を置くのが基本です。","frontOpp":"相手後衛が打つ場面では、前衛はネットに詰めます。詰めるほど相手の打てるコースが狭くなり、ボレーで前に入れます。","frontOwn":"味方後衛が打つ場面では、一歩下がります。打ち返されたボールやロブに備えるためです。","backStraight":"ストレート展開では、後衛は打ち合っている側のサービスサイドラインの真正面に立ちます。"}};
+  var THEORY = {"source":"ソフトテニスIQ｜陣形ラボ https://omicreate.github.io/jinkei-lab/ （2026-09-20 に基準配置と判定の本数を読み取り）","racket":0.69,"contact":0.5,"farExtra":4.0,"front":{"close":1.208,"step":0.8},"back":{"behind":0.69},"reach":{"front":[1.5,2.5],"back":[2,3]},"tenkai":[{"id":"cross","label":"正クロス展開","ob":3.0,"of":7.5,"mb":8.0,"mf":3.5,"whyFront":"前衛はコートの左端から約3.5m、ネットからラケット1.5〜2本分。センターの線の少し左（ストレート側）に立ちます。","whyBack":"後衛はコートの左端から約8.0m（右寄り）、ベースラインからラケット1本分後ろに立ちます。"},{"id":"reverseCross","label":"逆クロス展開","ob":8.0,"of":3.5,"mb":3.0,"mf":7.5,"whyFront":"前衛はコートの左端から約7.5m（右寄り）、ネットからラケット1.5〜2本分に立ちます。","whyBack":"後衛はコートの左端から約3.0m（左寄り）、ベースラインからラケット1本分後ろに立ちます。"},{"id":"straightRight","label":"右ストレート展開","ob":8.5,"of":6.5,"mb":8.5,"mf":6.5,"whyFront":"前衛はコートの左端から約6.5m。後衛と同じ右側の、少しセンター寄りに立ちます。","whyBack":"後衛はコートの左端から約8.5m（右寄り）。相手後衛とストレートで向き合う位置です。"},{"id":"straightLeft","label":"左ストレート展開","ob":2.5,"of":4.5,"mb":2.5,"mf":4.5,"whyFront":"前衛はコートの左端から約4.5m。後衛と同じ左側の、少しセンター寄りに立ちます。","whyBack":"後衛はコートの左端から約2.5m（左寄り）。相手後衛とストレートで向き合う位置です。"}],"forms":[{"id":"gankou","label":"雁行陣"},{"id":"wKouei","label":"W後衛（2人とも後ろ）","role":"back","x":[3.0,8.0],"names":["後衛1","後衛2"]},{"id":"wZenei","label":"W前衛（2人とも前）","role":"front","fromNet":5.885,"x":[3.5,7.5],"names":["前衛1","前衛2"]}],"tolerance":{"front":[0.6,1.2,2.0],"back":[1.0,1.8,2.8]},"note":"判定：前衛は線までラケット1.5本以内＝カバー圏内、2.5本以内＝踏み込みで届く。後衛は2本・3本（ラケット1本＝0.69m）。平面の距離で、球の速さ・高さ・回転は考えていません。基準の位置でも穴は残ります。どこが穴になるかを知って、打たれやすいコースに備えましょう。","why":{"frontOpp":"相手後衛が打つ場面では、前衛はネットからラケット1.5〜2本分まで詰めます（顧問の方針）。","frontOwn":"味方後衛が打つ場面では、そこから一歩下がって返球に備えます（顧問の方針）。"}};
+  var R = THEORY.racket;
 
   function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
   function dist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
   function fmt(v){ return (Math.round(v * 10) / 10).toFixed(1); }
-  // 相手の打点 h から見て、ストレート側（h と同じ側のサイドライン）が画面の左なら -1、右なら +1
-  function straightSign(h){ return h.x < W / 2 ? -1 : 1; }
+  function byId(list, id){ for(var i = 0; i < list.length; i++){ if(list[i].id === id) return list[i]; } return list[0]; }
 
-  // 前衛: 打点と味方のセンターマークを結んだ線上。
-  // ネットからの距離は「だれが打つ場面か」で決める（phase: "opp" 相手後衛が打つ＝詰める／"own" 味方後衛が打つ＝一歩下がる）
-  function frontDepth(phase){
-    return phase === "own" ? THEORY.front.close + THEORY.front.step : THEORY.front.close;
-  }
-  function frontIdeal(h, phase){
-    var dn = frontDepth(phase);
-    var y = NET + dn;
-    var t = (y - h.y) / (CENTER_MARK.y - h.y);
-    var x = h.x + (CENTER_MARK.x - h.x) * t;
-    // センターに近い打点ほどストレート寄せは小さくする
-    var off = Math.abs(h.x - W / 2) / (W / 2);
-    x += straightSign(h) * THEORY.front.straightShift * clamp(off * 1.6, 0, 1);
-    return { x: x, y: y };
-  }
-  // 後衛: 顧問の方針（2026-09-19）。サービスサイドライン（シングルスのサイドライン）を目印に立つ。
-  //   クロス展開（正クロス・逆クロス）: 打点と反対側のサービスサイドラインに右足を置く
-  //   ストレート展開: 打点と同じ側のサービスサイドラインの真正面に立つ
-  //   センターからの打点: コートのまん中
-  // 右足を線に置くと、体の中心は線より foot m だけ左（画面左）になる（ネットを向いて立つため）
-  var SVC_LEFT = Court.ALLEY, SVC_RIGHT = W - Court.ALLEY;
-  function backIdeal(h, phase, tenkai){
-    var y = L + THEORY.back.behind;
-    if(Math.abs(h.x - W / 2) < 1.2) return { x: W / 2, y: y };
-    var s = straightSign(h);
-    if(tenkai === "straight"){
-      return { x: s < 0 ? SVC_LEFT : SVC_RIGHT, y: y };
+  // ---------------- 基準配置 ----------------
+  var FRONT_Y = { opp: NET + THEORY.front.close, own: NET + THEORY.front.close + THEORY.front.step };
+  var BACK_Y = L + THEORY.back.behind;
+  var OPP_FRONT_Y = NET - THEORY.front.close, OPP_BACK_Y = -THEORY.back.behind;
+
+  // 味方2人の基準の位置（role: front / back）
+  function ownBase(tk, formId, phase){
+    var t = byId(THEORY.tenkai, tk), f = byId(THEORY.forms, formId);
+    if(f.id === "gankou"){
+      return {
+        mf: { x: t.mf, y: FRONT_Y[phase || "opp"], role: "front", name: "前衛", mark: "前" },
+        mb: { x: t.mb, y: BACK_Y, role: "back", name: "後衛", mark: "後" }
+      };
     }
-    var line = s < 0 ? SVC_RIGHT : SVC_LEFT;
-    return { x: line - THEORY.back.foot, y: y };
+    var role = f.role, y = role === "front" ? NET + f.fromNet : BACK_Y;
+    return {
+      mf: { x: f.x[0], y: y, role: role, name: f.names[0], mark: role === "front" ? "前" : "後" },
+      mb: { x: f.x[1], y: y, role: role, name: f.names[1], mark: role === "front" ? "前" : "後" }
+    };
   }
-  // 相手前衛（見るだけ）: 味方後衛の位置から同じきまりで置く
-  function oppFront(ownBack){
-    var y = NET - THEORY.front.close;
-    var t = (y - ownBack.y) / (0 - ownBack.y);
-    var x = ownBack.x + (W / 2 - ownBack.x) * t;
-    x += (ownBack.x < W / 2 ? -1 : 1) * THEORY.front.straightShift;
-    return { x: x, y: y };
+  function oppBase(tk){
+    var t = byId(THEORY.tenkai, tk);
+    return { ob: { x: t.ob, y: OPP_BACK_Y }, of: { x: t.of, y: OPP_FRONT_Y } };
   }
 
-  function describeHit(h){
-    var side = h.x < W / 2 ? "左" : "右";
-    var lat = Math.abs(h.x - W / 2);
-    var latText = lat < 1.2 ? "センター付近" : (lat > 3.6 ? "画面" + side + "のサイド寄り" : "画面" + side + "寄り");
-    var depthText = h.y < -0.4 ? "ベースラインの " + fmt(-h.y) + "m 後ろ" :
-                    (h.y > 0.4 ? "ベースラインより " + fmt(h.y) + "m 前" : "ベースライン付近");
-    return latText + "、" + depthText;
+  // ---------------- セオリー線 ----------------
+  // 相手（上側）は味方の方を向いて打つので、右利きのフォアの打点は画面の左側（-x）、バックは右側
+  function contactPoint(h, stroke){
+    return { x: h.x + (stroke === "back" ? 1 : -1) * THEORY.contact, y: h.y };
   }
-  function crossName(h, tenkai){
-    if(Math.abs(h.x - W / 2) < 1.2) return "センター";
-    if(tenkai === "straight") return h.x < W / 2 ? "左ストレート展開" : "右ストレート展開";
-    return h.x < W / 2 ? "正クロス" : "逆クロス";
+  function extendTo(c, target, y){
+    var dy = target.y - c.y;
+    return { x: c.x + (y - c.y) / dy * (target.x - c.x), y: y };
+  }
+  function theory(h, stroke){
+    var c = contactPoint(h, stroke), far = L + THEORY.farExtra;
+    var tl = { x: 0, y: L }, tc = { x: W / 2, y: L }, tr = { x: W, y: L };
+    return {
+      c: c,
+      left: extendTo(c, tl, far), center: extendTo(c, tc, far), right: extendTo(c, tr, far),
+      leftNet: extendTo(c, tl, NET), rightNet: extendTo(c, tr, NET), far: far
+    };
+  }
+  function footOnSegment(p, a, b){
+    var dx = b.x - a.x, dy = b.y - a.y, d = dx * dx + dy * dy;
+    var t = d ? clamp(((p.x - a.x) * dx + (p.y - a.y) * dy) / d, 0, 1) : 0;
+    return { x: a.x + t * dx, y: a.y + t * dy };
+  }
+  // 守る人から、近い外側の線とセンターの線までの距離
+  function coverage(p, th){
+    var fl = footOnSegment(p, th.c, th.left), fr = footOnSegment(p, th.c, th.right), fc = footOnSegment(p, th.c, th.center);
+    var dl = dist(p, fl), dr = dist(p, fr);
+    var outer = dl <= dr ? { side: "left", label: "左コース", d: dl, foot: fl } : { side: "right", label: "右コース", d: dr, foot: fr };
+    return { outer: outer, center: { label: "センター", d: dist(p, fc), foot: fc } };
+  }
+  function tier(d, role){
+    var n = d / R, lim = THEORY.reach[role];
+    return n <= lim[0] ? "cover" : n <= lim[1] ? "stretch" : "open";
+  }
+  var TIER = { cover: "カバー圏内", stretch: "踏み込みで届く", open: "リーチ外" };
+  function pill(d, role){
+    var t = tier(d, role);
+    return "<b>" + fmt(d / R) + "本</b> <span class=\"tier tier-" + t + "\">" + TIER[t] + "</span>";
+  }
+
+  function drawTheory(c, th, opt){
+    c.clear("guide");
+    var PX = Court.PAD_X;
+    if(opt.dead){
+      Court.poly(c, "guide", [{ x: -PX, y: NET }, th.leftNet, th.left, { x: -PX, y: th.far }], "g-dead");
+      Court.poly(c, "guide", [th.rightNet, { x: W + PX, y: NET }, { x: W + PX, y: th.far }, th.right], "g-dead");
+    }
+    if(opt.theory){
+      Court.poly(c, "guide", [th.leftNet, th.rightNet, th.right, th.left], "g-range");
+      Court.line(c, "guide", th.c, th.left, "g-edge-strong");
+      Court.line(c, "guide", th.c, th.right, "g-edge-strong");
+      Court.line(c, "guide", th.c, th.center, "g-center");
+      Court.dot(c, "guide", th.c, 0.2, "g-contact");
+    }
+  }
+  function drawReach(c, own, show){
+    c.clear("hint");
+    if(!show) return;
+    ["mf", "mb"].forEach(function(k){
+      var p = own[k], lim = THEORY.reach[p.role];
+      Court.dot(c, "hint", p, lim[1] * R, "g-reach-stretch");
+      Court.dot(c, "hint", p, lim[0] * R, "g-reach-cover");
+    });
   }
 
   // ---------------- しくみを見る ----------------
   var look = Court.create(document.getElementById("look-court"));
-  var PRESETS = THEORY.presets;
-  var hit = { x: PRESETS[0].x, y: PRESETS[0].y };
-  var phase = "opp";   // "opp" 相手後衛が打つ／"own" 味方後衛が打つ
-  var tenkai = PRESETS[0].tenkai || "cross";   // "cross" クロス展開／"straight" ストレート展開
-  var lookPieces = {
-    ob: Court.player(look, { side: "opp", role: "後", name: "打つ人", x: hit.x, y: hit.y, cls: "draggable" }),
-    of: Court.player(look, { side: "opp", role: "前", x: 7, y: NET - 3, cls: "is-ghost" }),
-    mf: Court.player(look, { side: "own", role: "前", name: "前衛", x: 3, y: NET + 3, reach: THEORY.front.reach }),
-    mb: Court.player(look, { side: "own", role: "後", name: "後衛", x: 8, y: L + 1 })
+  var S = { tenkai: THEORY.tenkai[0].id, form: "gankou", phase: "opp", stroke: "fore" };
+  var pos = {};
+  var pieces = {
+    ob: Court.player(look, { side: "opp", role: "後", name: "打つ人", x: 2, y: 0, cls: "draggable" }),
+    of: Court.player(look, { side: "opp", role: "前", x: 7, y: NET - 1.2, cls: "is-ghost" }),
+    mf: Court.player(look, { side: "own", role: "前", name: "前衛", x: 3, y: NET + 1.2, cls: "draggable" }),
+    mb: Court.player(look, { side: "own", role: "後", name: "後衛", x: 8, y: L + 0.7, cls: "draggable" })
   };
-  lookPieces.ob.setAttribute("tabindex", "0");
-  lookPieces.ob.setAttribute("role", "slider");
-  lookPieces.ob.setAttribute("aria-label", "相手の打つ位置（矢印キーで動かせます）");
-  lookPieces.mb.querySelector(".pl-name").textContent = "後衛";
+  ["ob", "mf", "mb"].forEach(function(k){ pieces[k].setAttribute("tabindex", "0"); });
+  pieces.ob.setAttribute("aria-label", "打つ人（相手後衛）。矢印キーで動かせます");
+  pieces.mf.setAttribute("aria-label", "味方の駒。矢印キーで動かせます");
+  pieces.mb.setAttribute("aria-label", "味方の駒。矢印キーで動かせます");
 
-  var presetBox = document.getElementById("look-presets");
-  PRESETS.forEach(function(p, i){
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "chip" + (i === 0 ? " active" : "");
-    b.textContent = p.label;
-    b.addEventListener("click", function(){
-      hit = { x: p.x, y: p.y };
-      tenkai = p.tenkai || "cross";
-      setActive(i); drawLook(true);
+  function resetPositions(){
+    var o = oppBase(S.tenkai), m = ownBase(S.tenkai, S.form, S.phase);
+    pos = { ob: o.ob, of: o.of, mf: m.mf, mb: m.mb };
+    ["mf", "mb"].forEach(function(k){
+      pieces[k].querySelector(".pl-text").textContent = pos[k].mark;
+      pieces[k].querySelector(".pl-name").textContent = pos[k].name;
     });
-    presetBox.appendChild(b);
-  });
-  function setActive(i){
-    Array.prototype.forEach.call(presetBox.children, function(c, j){ c.classList.toggle("active", j === i); });
   }
 
-  var phaseBox = document.getElementById("look-phase");
-  Array.prototype.forEach.call(phaseBox.querySelectorAll("button"), function(b){
-    b.addEventListener("click", function(){
-      phase = b.getAttribute("data-phase");
-      Array.prototype.forEach.call(phaseBox.querySelectorAll("button"), function(o){
-        o.classList.toggle("active", o === b);
-        o.setAttribute("aria-pressed", o === b ? "true" : "false");
+  function chipGroup(boxId, items, key){
+    var box = document.getElementById(boxId);
+    items.forEach(function(it){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip" + (S[key] === it.id ? " active" : "");
+      b.textContent = it.label; b.setAttribute("aria-pressed", S[key] === it.id ? "true" : "false");
+      b.addEventListener("click", function(){
+        S[key] = it.id;
+        Array.prototype.forEach.call(box.children, function(o){
+          o.classList.toggle("active", o === b); o.setAttribute("aria-pressed", o === b ? "true" : "false");
+        });
+        resetPositions(); drawLook(true);
       });
-      drawLook(true);
+      box.appendChild(b);
     });
-  });
-
-  var toggles = ["show-range", "show-front", "show-back", "show-reach"].reduce(function(o, id){
+  }
+  chipGroup("look-tenkai", THEORY.tenkai, "tenkai");
+  chipGroup("look-form", THEORY.forms, "form");
+  function attrGroup(boxId, attr, key){
+    var box = document.getElementById(boxId);
+    Array.prototype.forEach.call(box.querySelectorAll("button"), function(b){
+      b.addEventListener("click", function(){
+        S[key] = b.getAttribute(attr);
+        Array.prototype.forEach.call(box.querySelectorAll("button"), function(o){
+          o.classList.toggle("active", o === b); o.setAttribute("aria-pressed", o === b ? "true" : "false");
+        });
+        if(key === "phase"){ resetPositions(); }
+        drawLook(true);
+      });
+    });
+  }
+  attrGroup("look-phase", "data-phase", "phase");
+  attrGroup("look-stroke", "data-stroke", "stroke");
+  document.getElementById("look-reset").addEventListener("click", function(){ resetPositions(); drawLook(true); });
+  var toggles = ["show-theory", "show-dead", "show-reach"].reduce(function(o, id){
     o[id] = document.getElementById(id);
     o[id].addEventListener("change", function(){ drawLook(false); });
     return o;
   }, {});
 
-  function drawGuides(c, h, opt){
-    c.clear("guide");
-    var s = straightSign(h);
-    var sideX = s < 0 ? 0 : W;
-    if(opt.range){
-      Court.poly(c, "guide", [h, { x: 0, y: L }, { x: W, y: L }], "g-range");
-    }
-    if(opt.range && crossName(h, opt.tenkai) !== "センター"){
-      Court.poly(c, "guide", [h, { x: sideX, y: L }, { x: sideX - s * THEORY.straightLane, y: L }], "g-straight");
-      Court.line(c, "guide", h, { x: 0, y: L }, "g-edge");
-      Court.line(c, "guide", h, { x: W, y: L }, "g-edge");
-      Court.label(c, "guide", { x: sideX - s * 1.1, y: L - 1.6 }, "ストレート");
-    }
-    if(opt.front){
-      Court.line(c, "guide", h, CENTER_MARK, "g-center");
-      Court.dot(c, "guide", CENTER_MARK, 0.22, "g-ideal");
-    }
-    if(opt.back){
-      // 後衛の目印：サービスサイドライン（とその延長）を光らせる
-      if(Math.abs(h.x - W / 2) >= 1.2){
-        var sg = straightSign(h);
-        var lx = opt.tenkai === "straight" ? (sg < 0 ? SVC_LEFT : SVC_RIGHT) : (sg < 0 ? SVC_RIGHT : SVC_LEFT);
-        Court.line(c, "guide", { x: lx, y: NET + Court.SVC }, { x: lx, y: L + 2.2 }, "g-bisect");
-        Court.label(c, "guide", { x: clamp(lx, 1.5, W - 1.5), y: NET + Court.SVC + 0.9 }, "後衛の目印");
-      }
-    }
-  }
-
   function drawLook(animate){
-    var fi = frontIdeal(hit, phase), bi = backIdeal(hit, phase, tenkai);
-    Court.move(lookPieces.ob, hit.x, hit.y, true);
-    Court.move(lookPieces.mf, fi.x, fi.y, !animate);
-    Court.move(lookPieces.mb, bi.x, bi.y, !animate);
-    var of = oppFront(bi);
-    Court.move(lookPieces.of, of.x, of.y, !animate);
-    lookPieces.mf.querySelector(".pl-reach").style.display = toggles["show-reach"].checked ? "" : "none";
-    drawGuides(look, hit, { range: toggles["show-range"].checked, front: toggles["show-front"].checked, back: toggles["show-back"].checked, phase: phase, tenkai: tenkai });
+    ["ob", "of", "mf", "mb"].forEach(function(k){ Court.move(pieces[k], pos[k].x, pos[k].y, !animate || k === "ob"); });
+    var th = theory(pos.ob, S.stroke);
+    drawTheory(look, th, { theory: toggles["show-theory"].checked, dead: toggles["show-dead"].checked });
+    drawReach(look, pos, toggles["show-reach"].checked);
     look.clear("shot");
-    var dn = frontDepth(phase);
-    var s = straightSign(hit) < 0 ? "左" : "右";
-    var cn = crossName(hit, tenkai);
-    var st = tenkai === "straight" && cn !== "センター";
+    var t = byId(THEORY.tenkai, S.tenkai), f = byId(THEORY.forms, S.form);
+    var rows = "", hole = null;
+    ["mf", "mb"].forEach(function(k){
+      var p = pos[k], cv = coverage(p, th);
+      rows += "<dt>" + p.name + "</dt><dd>" + cv.outer.label + "の線まで " + pill(cv.outer.d, p.role) +
+        "<br>センターの線まで " + pill(cv.center.d, p.role) + "</dd>";
+      [cv.outer, cv.center].forEach(function(x){
+        if(!hole || x.d > hole.d) hole = { d: x.d, who: p.name, label: x.label, role: p.role, foot: x.foot, from: p };
+      });
+    });
+    if(hole){
+      Court.line(look, "hint", hole.from, hole.foot, "g-err");
+      Court.label(look, "hint", { x: (hole.from.x + hole.foot.x) / 2, y: (hole.from.y + hole.foot.y) / 2 - 0.5 }, fmt(hole.d / R) + "本");
+    }
+    var moved = ["mf", "mb"].some(function(k){ var b = ownBase(S.tenkai, S.form, S.phase)[k]; return dist(b, pos[k]) > 0.05; });
     document.getElementById("look-readout").innerHTML =
-      "<p class=\"ro-hit\"><b>" + cn + "</b>　" + describeHit(hit) + "</p>" +
-      "<dl>" +
-      "<dt>前衛</dt><dd>ネットから <b>" + fmt(dn) + "m</b>。" +
-        (cn === "センター" ? "センターマークへの線の上に立ち、どちらにも動ける構え。" :
-          (st ? "ストレート展開でも、立つ線はクロス展開と同じ。後衛の前（画面" + s + "）に立つ形になる。ストレートを気にして外へ寄りすぎると、センターが空く。" :
-            "線の上に立ち、ほんの少しだけ画面" + s + "（ストレート側）へ。外へ寄りすぎるとセンターが空く。")) +
-        (phase === "own" ? "味方後衛が打つ場面なので、<b>一歩下がって</b>守りに備える。" :
-          "相手後衛が打つ場面なので、<b>ネットに詰めて</b>ボレーをねらう。") +
-      "</dd>" +
-      "<dt>後衛</dt><dd>ベースラインの約 " + fmt(THEORY.back.behind) + "m 後ろ。" +
-        (cn === "センター" ? "相手が打てる範囲のまん中で、左右どちらにも動ける位置。" :
-          st ? "打ち合っている画面" + s + "側の<b>サービスサイドラインの真正面</b>に立つ。" :
-          "画面" + (s === "左" ? "右" : "左") + "側の<b>サービスサイドラインに右足</b>を置いて構える（" + (cn === "正クロス" ? "正クロス展開" : "逆クロス展開") + "の基本）。") + "</dd>" +
-      "</dl>";
+      "<p class=\"ro-hit\"><b>" + t.label + "</b>・" + f.label + (moved ? "（駒を動かしています）" : "（基準の位置）") +
+      "　打つ人：相手後衛（" + (S.stroke === "fore" ? "フォア" : "バック") + "）</p>" +
+      "<dl>" + rows + "</dl>" +
+      (hole ? "<p class=\"hole\">今の穴：<b>" + hole.who + "</b>から" + hole.label + "の線まで約 " + fmt(hole.d / R) + " 本（" + TIER[tier(hole.d, hole.role)] + "）</p>" : "") +
+      "<p class=\"ro-note\">" + THEORY.note + "</p>";
   }
 
-  function dragOn(c, g, onMove, onEnd, bounds){
+  function dragOn(c, g, onMove, bounds, lockedFn){
     var dragging = false;
     function to(evt){
       var p = c.point(evt);
       onMove({ x: clamp(p.x, bounds.x0, bounds.x1), y: clamp(p.y, bounds.y0, bounds.y1) });
     }
-    function down(evt){
-      if(g.classList.contains("locked")) return;
-      dragging = true; evt.preventDefault(); to(evt);
-    }
-    g.addEventListener("pointerdown", down);
-    c.svg.addEventListener("pointerdown", function(evt){
-      if(dragging || g.classList.contains("locked") || evt.target.closest(".pl")) return;
-      dragging = true; to(evt);
+    g.addEventListener("pointerdown", function(evt){
+      if(lockedFn && lockedFn()) return;
+      evt.stopPropagation(); dragging = true; evt.preventDefault(); to(evt);
     });
     window.addEventListener("pointermove", function(evt){ if(dragging){ evt.preventDefault(); to(evt); } }, { passive: false });
-    window.addEventListener("pointerup", function(){ if(dragging){ dragging = false; if(onEnd) onEnd(); } });
+    window.addEventListener("pointerup", function(){ dragging = false; });
     g.addEventListener("keydown", function(evt){
-      if(g.classList.contains("locked")) return;
+      if(lockedFn && lockedFn()) return;
       var k = { ArrowLeft: [-0.25, 0], ArrowRight: [0.25, 0], ArrowUp: [0, -0.25], ArrowDown: [0, 0.25] }[evt.key];
       if(!k) return;
       evt.preventDefault();
       onMove({ x: clamp(g._x + k[0], bounds.x0, bounds.x1), y: clamp(g._y + k[1], bounds.y0, bounds.y1) });
     });
   }
-  dragOn(look, lookPieces.ob, function(p){ hit = p; setActive(-1); drawLook(false); }, null,
-    { x0: -1.5, x1: W + 1.5, y0: -3, y1: NET - 3.5 });
+  var OPP_AREA = { x0: -1.5, x1: W + 1.5, y0: -3, y1: NET - 3.5 };
+  var OWN_AREA = { x0: -1.5, x1: W + 1.5, y0: NET + 0.4, y1: L + 3 };
+  dragOn(look, pieces.ob, function(p){ pos.ob = p; drawLook(false); }, OPP_AREA);
+  dragOn(look, pieces.mf, function(p){ pos.mf.x = p.x; pos.mf.y = p.y; drawLook(false); }, OWN_AREA);
+  dragOn(look, pieces.mb, function(p){ pos.mb.x = p.x; pos.mb.y = p.y; drawLook(false); }, OWN_AREA);
 
+  resetPositions();
   drawLook(false);
 
   // ---------------- 立ってみる ----------------
@@ -1183,7 +1231,7 @@ var Court = (function(){
   var Q = { n: 0, total: 10, score: 0, list: [], answered: false, results: [] };
   var qp = {
     ob: Court.player(quiz, { side: "opp", role: "後", name: "打つ人", x: 2, y: 0 }),
-    of: Court.player(quiz, { side: "opp", role: "前", x: 7, y: NET - 3, cls: "is-ghost" }),
+    of: Court.player(quiz, { side: "opp", role: "前", x: 7, y: NET - 1.2, cls: "is-ghost" }),
     mate: Court.player(quiz, { side: "own", role: "後", x: 8, y: L + 1, cls: "is-ghost" }),
     me: Court.player(quiz, { side: "own", role: "?", name: "あなた", x: W / 2, y: NET + 7, cls: "draggable is-focus" })
   };
@@ -1200,24 +1248,15 @@ var Court = (function(){
     howto: document.getElementById("quiz-howto")
   };
 
-  function rand(a, b){ return a + Math.random() * (b - a); }
-  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
   function makeList(){
-    var list = [];
-    var scenes = THEORY.scenes.slice();
-    for(var i = 0; i < Q.total; i++){
-      var sc = scenes.splice(Math.floor(Math.random() * scenes.length), 1)[0];
-      if(!scenes.length) scenes = THEORY.scenes.slice();
-      var mirror = Math.random() < 0.5;
-      var x = rand(sc.x[0], sc.x[1]);
-      if(mirror) x = W - x;
-      var phase = sc.phase || "opp";
-      // 味方後衛が打つ場面は、後衛が打つ人なので前衛の問題にする
-      list.push({ scene: sc, h: { x: x, y: rand(sc.y[0], sc.y[1]) },
-        role: phase === "own" ? "front" : (i % 2 === 0 ? "front" : "back"), phase: phase,
-        tenkai: sc.tenkai || "cross" });
-    }
-    return list;
+    var all = [];
+    THEORY.tenkai.forEach(function(t){
+      all.push({ tenkai: t.id, role: "front", phase: "opp" });
+      all.push({ tenkai: t.id, role: "front", phase: "own" });
+      all.push({ tenkai: t.id, role: "back", phase: "opp" });
+    });
+    for(var i = all.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var tmp = all[i]; all[i] = all[j]; all[j] = tmp; }
+    return all.slice(0, Q.total);
   }
   function startQuiz(){
     Q.n = 0; Q.score = 0; Q.list = makeList(); Q.results = [];
@@ -1226,57 +1265,54 @@ var Court = (function(){
     showQuestion();
   }
   function showQuestion(){
-    var item = Q.list[Q.n];
-    var h = item.h;
+    var item = Q.list[Q.n], t = byId(THEORY.tenkai, item.tenkai);
     Q.answered = false;
     quiz.clear("guide"); quiz.clear("hint"); quiz.clear("shot");
-    Court.move(qp.ob, h.x, h.y, false);
-    var fi = frontIdeal(h, item.phase), bi = backIdeal(h, item.phase, item.tenkai);
-    ideal = item.role === "front" ? fi : bi;
-    var mate = item.role === "front" ? bi : fi;
+    var o = oppBase(item.tenkai), m = ownBase(item.tenkai, "gankou", item.phase);
+    Court.move(qp.ob, o.ob.x, o.ob.y, false);
+    Court.move(qp.of, o.of.x, o.of.y, false);
+    ideal = item.role === "front" ? m.mf : m.mb;
+    var mate = item.role === "front" ? m.mb : m.mf;
     qp.mate.querySelector(".pl-text").textContent = item.role === "front" ? "後" : "前";
     Court.move(qp.mate, mate.x, mate.y, false);
-    var of = oppFront(bi);
-    Court.move(qp.of, of.x, of.y, false);
-    var start = item.role === "front" ? { x: W / 2, y: NET + 5 } : { x: W / 2, y: L - 2 };
+    var start = item.role === "front" ? { x: W / 2, y: NET + 4.5 } : { x: W / 2, y: L - 2.5 };
     Court.move(qp.me, start.x, start.y, true);
     qp.me.classList.remove("locked");
+    // 打つ人を示すため、セオリー線は最初から見せる（答えの位置は見せない）
+    drawTheory(quiz, theory(o.ob, "fore"), { theory: true, dead: false });
     E.count.textContent = "第" + (Q.n + 1) + "問 / " + Q.total;
     Array.prototype.forEach.call(E.dots.children, function(d, i){
       d.className = i < Q.n ? (Q.results[i] >= 6 ? "done-correct" : "done-wrong") : (i === Q.n ? "current" : "");
     });
-    E.role.innerHTML = "あなたは <b>" + (item.role === "front" ? "前衛" : "後衛") + "</b>";
-    var cnq = crossName(h, item.tenkai);
-    E.scene.innerHTML = item.scene.text + "<br><span class=\"sub\">（" + (cnq === "センター" ? "" : cnq + "・") + describeHit(h) + "）</span>";
+    E.role.innerHTML = "あなたは <b>" + (item.role === "front" ? "前衛" : "後衛") + "</b>（雁行陣）";
+    E.scene.innerHTML = "<b>" + t.label + "</b>。" +
+      (item.role === "front" && item.phase === "own" ? "味方後衛が打とうとしている。" : "相手後衛が打とうとしている。") +
+      "<br><span class=\"sub\">白い線は、打つ人の打点から引いたセオリー線です。基準の位置に立ちましょう。</span>";
     E.verdict.hidden = true;
-    E.answer.hidden = false; E.next.hidden = true;
-    E.howto.hidden = false;
+    E.answer.hidden = false; E.next.hidden = true; E.howto.hidden = false;
   }
-  dragOn(quiz, qp.me, function(p){ if(!Q.answered) Court.move(qp.me, p.x, p.y, true); }, null,
-    { x0: -1.5, x1: W + 1.5, y0: NET + 0.4, y1: L + 3 });
+  dragOn(quiz, qp.me, function(p){ Court.move(qp.me, p.x, p.y, true); }, OWN_AREA, function(){ return Q.answered; });
+  quiz.svg.addEventListener("pointerdown", function(evt){
+    if(Q.answered || evt.target.closest(".pl")) return;
+    var p = quiz.point(evt);
+    Court.move(qp.me, clamp(p.x, OWN_AREA.x0, OWN_AREA.x1), clamp(p.y, OWN_AREA.y0, OWN_AREA.y1), true);
+  });
 
   function advice(item, me){
-    var h = item.h, tips = [];
-    var dy = me.y - ideal.y;                 // 正なら下がりすぎ
-    var s = straightSign(h);
-    var dx = (me.x - ideal.x) * s;            // 正ならストレート側に寄りすぎ
-    var tolY = item.role === "front" ? 0.5 : 0.7, tolX = item.role === "front" ? 0.4 : 0.6;
+    var tips = [];
+    var dy = me.y - ideal.y, dx = me.x - ideal.x;
+    var tolY = item.role === "front" ? 0.5 : 0.7, tolX = item.role === "front" ? 0.5 : 0.7;
     if(item.role === "front"){
       if(dy > tolY) tips.push("ネットから遠すぎます。あと約 " + fmt(dy) + "m <b>前へ</b>。" +
-        (item.phase === "own" ? "味方後衛が打つ場面でも、下がるのは一歩です。" : "相手後衛が打つ場面は、ネットに詰めてボレーをねらいます。"));
+        (item.phase === "own" ? "味方が打つ場面でも、下がるのは一歩です。" : "相手が打つ場面は、ネットからラケット1.5〜2本分まで詰めます。"));
       if(dy < -tolY) tips.push("ネットに近すぎます。あと約 " + fmt(-dy) + "m <b>下がる</b>。" +
-        (item.phase === "own" ? "味方後衛が打つ場面は、一歩下がって守りに備えます。" : "詰めすぎると、ロブや足元のボールに届きません。"));
-      if(dx > tolX) tips.push("ストレート側に寄りすぎです（約 " + fmt(dx) + "m）。これではセンターを抜かれます。");
-      if(dx < -tolX) tips.push("センター側に寄りすぎです（約 " + fmt(-dx) + "m）。<b>ストレートを抜かれます</b>。打点とセンターマークを結んだ線まで戻りましょう。");
+        (item.phase === "own" ? "味方が打つ場面は、一歩下がって返球に備えます。" : "詰めすぎると、ロブや足元のボールに届きません。"));
     } else {
-      if(dy > tolY) tips.push("後ろに下がりすぎです。約 " + fmt(dy) + "m 前へ。");
-      if(dy < -tolY) tips.push("前に出すぎです。深いボールに振り遅れます。約 " + fmt(-dy) + "m 下がる。");
-      if(Math.abs(me.x - ideal.x) > tolX){
-        var dir = me.x > ideal.x ? "左" : "右";
-        tips.push("画面の" + dir + "へ約 " + fmt(Math.abs(me.x - ideal.x)) + "m。" +
-          (item.tenkai === "straight" ? "ストレート展開では、打ち合っている側のサービスサイドラインの真正面に立ちます。" :
-            (Math.abs(item.h.x - W / 2) < 1.2 ? "相手がセンターから打つときは、コートのまん中に立ちます。" : "クロス展開では、サービスサイドラインに右足を置きます。")));
-      }
+      if(dy > tolY) tips.push("後ろに下がりすぎです。約 " + fmt(dy) + "m 前へ（ベースラインからラケット1本分後ろが基準）。");
+      if(dy < -tolY) tips.push("前に出すぎです。約 " + fmt(-dy) + "m 下がる（ベースラインからラケット1本分後ろが基準）。");
+    }
+    if(Math.abs(dx) > tolX){
+      tips.push("画面の" + (dx > 0 ? "左" : "右") + "へ約 " + fmt(Math.abs(dx)) + "m。");
     }
     return tips;
   }
@@ -1284,30 +1320,31 @@ var Court = (function(){
   E.answer.addEventListener("click", function(){
     if(Q.answered) return;
     Q.answered = true;
-    var item = Q.list[Q.n];
+    var item = Q.list[Q.n], t = byId(THEORY.tenkai, item.tenkai);
     var me = { x: qp.me._x, y: qp.me._y };
     var d = dist(me, ideal);
     var tol = THEORY.tolerance[item.role];
     var pts = d <= tol[0] ? 10 : d <= tol[1] ? 6 : d <= tol[2] ? 3 : 0;
     Q.score += pts; Q.results.push(pts);
     qp.me.classList.add("locked");
-    drawGuides(quiz, item.h, { range: true, front: item.role === "front", back: item.role === "back", phase: item.phase, tenkai: item.tenkai });
+    var th = theory({ x: qp.ob._x, y: qp.ob._y }, "fore");
+    drawTheory(quiz, th, { theory: true, dead: true });
     Court.dot(quiz, "hint", ideal, 0.62, item.role === "front" ? "g-ideal" : "g-ideal-back");
     Court.dot(quiz, "hint", ideal, tol[0], "g-band");
     Court.line(quiz, "hint", me, ideal, "g-err");
+    var cvMe = coverage(me, th), cvBase = coverage(ideal, th);
     var tips = advice(item, me);
     var head = pts === 10 ? "◎ ぴったり" : pts === 6 ? "○ おしい" : pts === 3 ? "△ もう少し" : "× ずれています";
     E.verdict.className = "verdict " + (pts >= 6 ? "is-good" : "is-bad");
     E.verdict.innerHTML =
-      "<p class=\"v-head\">" + head + "<span>（" + pts + "点・理想の位置から " + fmt(d) + "m）</span></p>" +
-      (tips.length ? "<ul>" + tips.map(function(t){ return "<li>" + t + "</li>"; }).join("") + "</ul>" : "") +
-      "<p class=\"v-why\">" + (item.role === "front" ? THEORY.why.front : (item.tenkai === "straight" ? THEORY.why.backStraight : THEORY.why.back)) +
-        (item.role === "front" ? "<br>" + (item.phase === "own" ? THEORY.why.frontOwn : THEORY.why.frontOpp) : "") + "</p>" +
-      (item.scene.note ? "<p class=\"v-why\">" + item.scene.note + "</p>" : "");
+      "<p class=\"v-head\">" + head + "<span>（" + pts + "点・基準の位置から " + fmt(d) + "m）</span></p>" +
+      (tips.length ? "<ul>" + tips.map(function(x){ return "<li>" + x + "</li>"; }).join("") + "</ul>" : "") +
+      "<p class=\"v-why\">あなたの位置：" + cvMe.outer.label + "の線まで " + pill(cvMe.outer.d, item.role) + "／センターの線まで " + pill(cvMe.center.d, item.role) + "<br>" +
+      "基準の位置：" + cvBase.outer.label + "の線まで " + pill(cvBase.outer.d, item.role) + "／センターの線まで " + pill(cvBase.center.d, item.role) + "</p>" +
+      "<p class=\"v-why\">" + t.label + "の基準：" + (item.role === "front" ? t.whyFront : t.whyBack) +
+      (item.role === "front" ? "<br>" + (item.phase === "own" ? THEORY.why.frontOwn : THEORY.why.frontOpp) : "") + "</p>";
     E.verdict.hidden = false;
-    E.answer.hidden = true;
-    E.howto.hidden = true;
-    E.next.hidden = false;
+    E.answer.hidden = true; E.howto.hidden = true; E.next.hidden = false;
     E.next.textContent = Q.n + 1 < Q.total ? "次の問題へ" : "結果を見る";
     E.next.focus();
   });
@@ -1319,15 +1356,15 @@ var Court = (function(){
     E.result.hidden = false;
     E.next.hidden = true;
     E.score.textContent = Q.score;
-    E.rtitle.textContent = Q.score >= 80 ? "立ち位置はばっちり" : Q.score >= 50 ? "だいたいつかめています" : "線の引き方から確かめよう";
-    E.rtext.textContent = Q.score >= 80 ? "コートでも、相手が打つ瞬間に同じ場所へ動けているか、練習で確かめてみましょう。" :
-      Q.score >= 50 ? "ずれの多かった役割（前衛・後衛）の説明を読み直して、もう一度挑戦しましょう。" :
-      "「しくみを見る」で相手の駒を動かし、前衛の線と後衛の線がどう動くかを見てから再挑戦しましょう。";
+    E.rtitle.textContent = Q.score >= 80 ? "基準の位置はばっちり" : Q.score >= 50 ? "だいたいつかめています" : "基準の位置から確かめよう";
+    E.rtext.textContent = Q.score >= 80 ? "コートでも、展開が変わったときに同じ場所へ動けているか、練習で確かめてみましょう。" :
+      Q.score >= 50 ? "ずれの多かった展開を「しくみを見る」で確かめてから、もう一度挑戦しましょう。" :
+      "「しくみを見る」で4つの展開の基準の位置を順に表示して、前衛と後衛の場所を覚えてから再挑戦しましょう。";
     var best = 0;
-    try{ best = Number(localStorage.getItem("softtennis.position.best") || 0); }catch(e){}
+    try{ best = Number(localStorage.getItem("softtennis.position.best2") || 0); }catch(e){}
     if(Q.score > best){
       best = Q.score;
-      try{ localStorage.setItem("softtennis.position.best", String(best)); }catch(e){}
+      try{ localStorage.setItem("softtennis.position.best2", String(best)); }catch(e){}
       E.best.textContent = "自己ベスト更新！（" + best + "点）";
     } else {
       E.best.textContent = "自己ベスト: " + best + "点（この端末）";
@@ -1347,7 +1384,6 @@ var Court = (function(){
       document.getElementById(t.getAttribute("aria-controls")).hidden = i !== j;
     });
     if(i === 1 && !Q.list.length) startQuiz();
-    try{ localStorage.setItem("softtennis.position.tab", String(i)); }catch(e){}
   }
   tabs.forEach(function(t, i){
     t.addEventListener("click", function(){ selectTab(i); });
