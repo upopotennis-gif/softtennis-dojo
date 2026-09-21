@@ -556,7 +556,7 @@ button.btn{ border-radius:6px; }
 .c-line{ stroke:var(--court-line); stroke-width:.05; fill:none; }
 .c-net line{ stroke:var(--net); stroke-width:.16; }
 .c-net circle{ fill:var(--net); }
-.c-label text{ fill:var(--court-line); font-size:.62px; font-weight:700; opacity:.78; letter-spacing:.08px; }
+.c-label text{ text-anchor:start; fill:var(--court-line); font-size:.62px; font-weight:700; opacity:.78; letter-spacing:.08px; }
 .c-note{ fill:var(--court-line); font-size:.52px; font-weight:700; paint-order:stroke; stroke:var(--court-out); stroke-width:.14px; }
 
 .pl{ transition:transform .55s cubic-bezier(.3,.7,.3,1); }
@@ -893,8 +893,8 @@ var Court = (function(){
     el("circle", { cx: W + 0.914, cy: NET, r: 0.14 }, net);
     if(opts.labels !== false){
       var lab = el("g", { "class": "c-label" }, svg);
-      el("text", { x: W / 2, y: -PAD_Y + 0.55 }, lab).textContent = opts.topLabel || "相手コート";
-      el("text", { x: W / 2, y: L + PAD_Y - 0.5 }, lab).textContent = opts.bottomLabel || "味方コート";
+      el("text", { x: -PAD_X + 0.25, y: -PAD_Y + 0.55, "text-anchor": "start" }, lab).textContent = opts.topLabel || "相手コート";
+      el("text", { x: -PAD_X + 0.25, y: L + PAD_Y - 0.5, "text-anchor": "start" }, lab).textContent = opts.bottomLabel || "味方コート";
     }
     var layers = {};
     ["guide", "shot", "hint", "player", "ui"].forEach(function(k){
