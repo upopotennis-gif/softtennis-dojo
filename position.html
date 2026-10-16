@@ -1136,9 +1136,12 @@ var Court = (function(){
   // side：own（ネットを向くので自分の右＝画面右）／opp（自分の右＝画面左）
   var STANCES = [
     { id: "basic", label: "基本（展開で決まる）" }, { id: "kakehiki", label: "駆け引き（体の真ん中）" },
-    { id: "mamori", label: "守り（後衛がいる側の足）" }, { id: "seme", label: "攻め（後衛がいない側の足）" }
+    { id: "mamori", label: "守り（後衛がいる側の足）" }, { id: "seme", label: "攻め（後衛がいない側の足）" },
+    { id: "lob", label: "ロブ直後（センターをまたぐ）", only: "straightLeft" }
   ];
+  // ロブで左ストレート展開になった直後の1本だけは、センターライン（コートの中央）をまたいで立つ（顧問の方針、2026-10-13）
   function placeFront(lx, side, hitterX, partnerX, stance){
+    if(stance === "lob") return { x: W / 2, foot: "C", footDir: 0, kind: "ロブ直後", lob: true };
     var rs = side === "own" ? 1 : -1;
     var hitterRight = (hitterX - W / 2) * rs > 0, partnerRight = (partnerX - W / 2) * rs >= 0;
     var foot = stance === "kakehiki" ? "C" : stance === "mamori" ? (partnerRight ? "R" : "L") :
@@ -1299,13 +1302,29 @@ var Court = (function(){
         Array.prototype.forEach.call(box.children, function(o){
           o.classList.toggle("active", o === b); o.setAttribute("aria-pressed", o === b ? "true" : "false");
         });
-        resetPositions(); drawLook(true);
+        syncOnly(); resetPositions(); drawLook(true);
       });
+      if(it.only){ b.setAttribute("data-only", it.only); b.dataset.key = key; }
+      b.dataset.id = it.id;
       box.appendChild(b);
+    });
+  }
+  // 特定の展開でだけ使う立ち方（ロブ直後＝左ストレート）は、その展開のときだけ出す
+  function syncOnly(){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-only]"), function(b){
+      var show = S.tenkai === b.getAttribute("data-only");
+      b.hidden = !show;
+      if(!show && S[b.dataset.key] === b.dataset.id){
+        S[b.dataset.key] = "basic";
+        Array.prototype.forEach.call(b.parentNode.children, function(o){
+          var on = o.dataset.id === "basic"; o.classList.toggle("active", on); o.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
     });
   }
   chipGroup("look-tenkai", THEORY.tenkai, "tenkai");
   chipGroup("look-stance", STANCES, "stance");
+  syncOnly();
   chipGroup("look-form", THEORY.forms, "form");
   function attrGroup(boxId, attr, key){
     var box = document.getElementById(boxId);
@@ -1348,7 +1367,8 @@ var Court = (function(){
       var p = pos[k], cv = coverage(p, th);
       var how = "";
       if(k === "mf" && p.role === "front" && p.foot){
-        how = "（" + (p.foot === "C" ? "<b>体の真ん中</b>" : "<b>" + (p.foot === "R" ? "右足" : "左足") + "</b>") +
+        how = p.kind === "ロブ直後" ? "（<b>センターライン（コートの真ん中）をまたぐ</b>＝ロブで左ストレート展開になった直後の1本。抜かれたら取る人がいないため。続いたら基本に戻す）<br>" :
+          "（" + (p.foot === "C" ? "<b>体の真ん中</b>" : "<b>" + (p.foot === "R" ? "右足" : "左足") + "</b>") +
           "をセンターの線の上＝<b>" + p.kind + "</b>のポジション）<br>";
         var z = ZONE[p.zone];
         if(z) how += "（相手後衛は" + z.where + "→" + (S.ownDepth === "auto" ? z.act : "前後は手動で選択中") + "）<br>";
